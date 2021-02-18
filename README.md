@@ -106,7 +106,7 @@ The following are the steps to be followed to get this package working:
   4.) Run the following commands in seperate terminals:
 
       roslaunch sawyer_irl_project robot_gazebo_params.launch
-      roslaunch sawyer_irl_project spawn_move_claim_onion.launch
+      roslaunch sawyer_irl_project spawn_move_claim_onion.launch rviz_gui:=True
       roslaunch sawyer_irl_project pnp_node.launch
  
   5.) Now, if you want to run the same on the real Sawyer Robot,
