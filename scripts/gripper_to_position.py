@@ -29,7 +29,7 @@ def gripper_to_pos(position, force, speed, hp):
 	
     hp_g = True
 
-    rospy.loginfo("I'm in the function")
+    # rospy.loginfo("I'm in the function")
 
     pub = rospy.Publisher('/gripper/output', outputMsg.Robotiq2FGripper_robot_output, queue_size=1000)
     

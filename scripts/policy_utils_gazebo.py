@@ -1,10 +1,11 @@
+import numpy as np
 nOnionLoc = 4
 nEEFLoc = 4
 nPredict = 3
 nlistIDStatus = 3
 nS = nOnionLoc*nEEFLoc*nPredict*nlistIDStatus
 nA = 7
-policy = np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy_pick.csv', delimiter=' ')
+policy = np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
 
 def sid2vals(s, nOnionLoc=4, nEEFLoc=4, nPredict=3, nlistIDStatus=3):
     sid = s
@@ -43,9 +44,8 @@ def getState(onionName, predic):
             '/gazebo/get_model_state', GetModelState)
         print("Onion name is: ", onionName)
         onion_coordinates = model_coordinates(onionName, "").pose
-    except rospy.ServiceException, e:
-        print "Service call failed: %s" % e
-
+    except rospy.ServiceException as e:
+        print ("Service call failed: %s" % e)
     if onion_coordinates.position.x > 0.5 and onion_coordinates.position.x < 0.9 and onion_coordinates.position.y > -0.6 and onion_coordinates.position.y < 0.3 and onion_coordinates.position.z > 0.8 and onion_coordinates.position.z < 0.9:
         pnp.onionLoc =  0    # On Conveyor
         print("OnionLoc is: On conveyor {0}".format(pnp.onionLoc))

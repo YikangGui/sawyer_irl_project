@@ -17,6 +17,6 @@
  <!--Collision objects node -->
  <node name="planning_scene_sawyer" pkg="sawyer_irl_project" type="planning_scene_sawyer" respawn="false" output="screen">
     <rosparam command="load" file="$(find sawyer_moveit_config)/config/kinematics.yaml"/>
-  </node>
+ </node>
 
 </launch>
