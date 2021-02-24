@@ -11,7 +11,7 @@ This package uses Inverse Reinforcement Learning -- Apprenticeship Learning/Lear
 This package is built upon the Sawyer/Intera ROS packages and uses Robotiq 2F-85 Gripper as the End Effector.
 ## The following instructions are written for Ubuntu 16.04, ROS Kinetic. If you are on Melodic, check the additional changes on [Melodic migration Readme file](https://github.com/thinclab/sawyer_irl_project/blob/master/Melodic_Migration_Readme.md).
 
-If you need to install the packages for Kinect V2 with Ubuntu, check out this [link](https://github.com/prasuchit/sawyer_irl_project/blob/master/Kinect_install_readme.md).
+If you need to install the packages for Kinect V2 with Ubuntu, check out this [link](https://github.com/thinclab/sawyer_irl_project/blob/master/Kinect_install_readme.md).
 
 The following are the steps to be followed to get this package working:
 
@@ -41,7 +41,7 @@ The following are the steps to be followed to get this package working:
   
    - Here's the wiki [link](https://ros-planning.github.io/moveit_tutorials/doc/trac_ik/trac_ik_tutorial.html) for reference.
    
-  2.1) This is still a work in progress, but if you want to add STOMP path planning library as a smoothing filter over OMPL, check these [instructions](https://github.com/prasuchit/sawyer_irl_project/blob/master/OMPL-STOMP_smoothing_filter.md)
+  2.1) This is still a work in progress, but if you want to add STOMP path planning library as a smoothing filter over OMPL, check these [instructions](https://github.com/thinclab/sawyer_irl_project/blob/master/OMPL-STOMP_smoothing_filter.md)
       
   3.) Now that you have a catkin workspace setup, in you src folder, git clone the following packages:
   
@@ -106,7 +106,7 @@ The following are the steps to be followed to get this package working:
   4.) Run the following commands in seperate terminals:
 
       roslaunch sawyer_irl_project robot_gazebo_params.launch
-      roslaunch sawyer_irl_project spawn_move_claim_onion.launch
+      roslaunch sawyer_irl_project spawn_move_claim_onion.launch rviz_gui:=True
       roslaunch sawyer_irl_project pnp_node.launch
  
   5.) Now, if you want to run the same on the real Sawyer Robot,
@@ -132,7 +132,7 @@ The following are the steps to be followed to get this package working:
          roslaunch sawyer_moveit_config sawyer_moveit.launch
          
    - For obtaining coordinates using vision:
-          Refer to [this link](https://github.com/prasuchit/sanet_onionsorting/blob/master/README.md)
+          Refer to [this link](https://github.com/thinclab/sanet_onionsorting/blob/master/README.md)
           
    - For regular pick and place:
         
