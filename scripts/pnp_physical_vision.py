@@ -14,12 +14,12 @@ from os import system
 import rospy
 from time import sleep
 from sawyer_irl_project.msg import OBlobs
+from sanet_onionsorting.srv import yolo_srv
 import numpy as np
 from smach import *
 from smach_ros import *
 from smach_msgs.msg import *
-import copy
-
+from sanet_onionsorting.scripts.rgbd_imgpoint_to_tf import Camera
 
 # Global initializations
 pnp = PickAndPlace(init_node = False)
@@ -52,17 +52,29 @@ class Get_info(State):
         self.y = []
         self.z = []
         self.color = []
-        # rospy.Subscriber("/object_location", OBlobs, self.callback_vision)
         self.is_updated = False
-        self.callback_vision(rospy.wait_for_message("/object_location", OBlobs))
-
-    def callback_vision(self, msg):
-        # print '\nCallback vision\n'
-        self.x = msg.x
-        self.y = msg.y
-        self.z = msg.z
-        self.color = msg.color
+        rospy.wait_for_service("/get_predictions")  # Contains the centroids of the obj bounding boxes
+        gip_service = rospy.ServiceProxy("/get_predictions", yolo_srv)
+        response = gip_service()
+        rgbtopic = '/kinect2/hd/image_color_rect'
+        depthtopic = '/kinect2/hd/image_depth_rect'
+        camerainfo = '/kinect2/hd/camera_info'
+        camera = Camera('kinectv2', rgbtopic, depthtopic, camerainfo, response)
+        self.x = camera.OBlobs_x
+        self.y = camera.OBlobs_y
+        self.z = camera.OBlobs_z
+        self.color = camera.colors
         self.is_updated = True
+        # rospy.Subscriber("/object_location", OBlobs, self.callback_vision)
+        # self.callback_vision(rospy.wait_for_message("/object_location", OBlobs))
+
+    # def callback_vision(self, msg):
+    #     # print '\nCallback vision\n'
+    #     self.x = msg.x
+    #     self.y = msg.y
+    #     self.z = msg.z
+    #     self.color = msg.color
+    #     self.is_updated = True
     
     def execute(self, userdata):
         rospy.loginfo('Executing state: Get_info')
@@ -106,7 +118,7 @@ class Claim(State):
         max_index = len(userdata.color)
         pnp.onion_index = 0
         for i in range(max_index):
-            if userdata.y[i] > -0.5:
+            if userdata.y[i] > -0.35:
                 pnp.target_location_x = userdata.x[i]
                 pnp.target_location_y = userdata.y[i]
                 pnp.target_location_z = userdata.z[i]
