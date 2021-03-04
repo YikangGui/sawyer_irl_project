@@ -90,7 +90,7 @@ The following are the steps to be followed to get this package working:
            rospack depends [name of package]
  
      - This should give you the dependencies you are missing for any given package.
-     - Do a catkin_make to compile. If you face a soem error, try the following command (Note: This may not be your error, check before executing this command)
+     - Do a 'catkin_make install' to compile and install. If you face a soem error, try the following command (Note: This may not be your error, check before executing this command)
      
     sudo apt-get install ros-<YOUR ROS DISTRO>-socketcan-interface ros-<YOUR ROS DISTRO>-rospy-message-converter ros-<YOUR ROS DISTRO>-effort-controllers python-pymodbus ros-<YOUR ROS DISTRO>-joystick-drivers ros-<YOUR ROS DISTRO>-soem
     
