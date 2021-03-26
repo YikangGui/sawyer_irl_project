@@ -30,7 +30,9 @@ def ClaimNewOnion():
                                 'color':'sm_color','counter':'sm_counter'})
         # Execute SMACH plan
         outcome_claim = ClaimNewOnion.execute()
-        # return outcome_claim
+        # print '\nClaim outcome is: ', outcome_claim
+        # ppv.rospy.sleep(100)
+        return outcome_claim
 
     except ppv.rospy.ROSInterruptException:
         return
@@ -75,6 +77,7 @@ def Pick():
 
         # Execute SMACH plan
         outcome_pick = Pick.execute()
+        return outcome_pick
 
     except ppv.rospy.ROSInterruptException:
         return
@@ -100,6 +103,7 @@ def InspectAfterPicking():
 
         # Execute SMACH plan
         outcome_inspect = InspectAfterPicking.execute()
+        return outcome_inspect
 
     except ppv.rospy.ROSInterruptException:
         return
@@ -129,8 +133,9 @@ def PlaceInBin():
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'counter':'sm_counter'})
         # Execute SMACH plan
-        outcome_place = InspectAfterPicking.execute()
-        ppv.rospy.sleep(5)
+        outcome_place = PlaceInBin.execute()
+        return outcome_place
+
     except ppv.rospy.ROSInterruptException:
         return
     except KeyboardInterrupt:
@@ -153,13 +158,19 @@ def PlaceOnConveyor():
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'color': 'sm_color','counter':'sm_counter'})
             ppv.StateMachine.add('DETACH', ppv.Detach_object(),
-                            transitions={'success':'SUCCEEDED', 
+                            transitions={'success':'LIFTUP', 
                                         'failed':'DETACH',
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'counter':'sm_counter'})
+            ppv.StateMachine.add('LIFTUP', ppv.Liftup(),
+                        transitions={'success': 'SUCCEEDED', 
+                                    'failed':'LIFTUP',
+                                    'timed_out': 'TIMED_OUT'},
+                        remapping={'counter':'sm_counter'})
         # Execute SMACH plan
         outcome_place = PlaceOnConveyor.execute()
-        ppv.rospy.sleep(5)
+        return outcome_place
+
     except ppv.rospy.ROSInterruptException:
         return
     except KeyboardInterrupt:
@@ -170,23 +181,24 @@ def main():
     global current_state
     policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
-    print("\nI'm in main now!")
+    # print "\nI'm in main now!"
     ppv.rospy.init_node('policy_exec_phys', anonymous=True, disable_signals=False)
-    outcome = None      
-    try:
-        actList[4]()
-        while outcome != 'SORT COMPLETE':
-            print("Current state is: ",ppv.current_state)
-            print("Executing action: ",policy[ppv.current_state])
+    outcome = actList[4]()      
+    while not ppv.rospy.is_shutdown() and outcome != 'SORT COMPLETE':
+        print '\n OUTCOME: ', outcome
+        # ppv.rospy.sleep(10)
+        try:
+            print '\nCurrent state is: ',ppv.current_state
+            print '\nExecuting action: ',policy[ppv.current_state]
             outcome = actList[policy[ppv.current_state]]()
-    except ppv.rospy.ROSInterruptException:
-        ppv.rospy.signal_shutdown("Shutting down node, ROS interrupt received!")
-    except KeyboardInterrupt:
-        ppv.rospy.signal_shutdown("Shutting down node, Keyboard interrupt received!")
-    ppv.rospy.spin()
+        except ppv.rospy.ROSInterruptException:
+            ppv.rospy.signal_shutdown("Shutting down node, ROS interrupt received!")
+        except KeyboardInterrupt:
+            ppv.rospy.signal_shutdown("Shutting down node, Keyboard interrupt received!")
+    # ppv.rospy.spin()
         
 if __name__ == '__main__':
-    print("\nCalling Main!")
+    # print("\nCalling Main!")
     try:
         main()
     except ppv.rospy.ROSInterruptException:

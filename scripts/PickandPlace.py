@@ -23,6 +23,8 @@ from sawyer_irl_project.msg import onions_blocks_poses
 from gazebo_ros_link_attacher.srv import Attach, AttachRequest, AttachResponse
 from moveit_msgs.msg import Constraints, OrientationConstraint, PositionConstraint
 import copy
+import random
+
 
 
 class PickAndPlace(object):
@@ -51,7 +53,7 @@ class PickAndPlace(object):
 
         group_name = "right_arm"
 
-        group = moveit_commander.MoveGroupCommander(group_name)
+        group = moveit_commander.MoveGroupCommander(group_name, wait_for_servers=5.0)
         # See ompl_planning.yaml for a complete list
         group.set_planner_id("RRTConnectkConfigDefault")
 
@@ -71,7 +73,7 @@ class PickAndPlace(object):
             self._limb_name = limb  # string
             self._limb = intera_interface.Limb(limb)
             self._tip_name = tip_name
-        print(robot.get_current_state())
+        # print(robot.get_current_state())
 
         # Misc variables
         self.robot = robot
@@ -370,9 +372,9 @@ class PickAndPlace(object):
         group.clear_path_constraints()
         after_dip = group.get_current_pose().pose.position.z
         if dip and (before_dip > after_dip):
-            print "\nBefore dip z pose: ",before_dip
-            print "\nAfter dip z pose: ",after_dip
-            print "\nSuccessfully dipped!"
+            # print "\nBefore dip z pose: ",before_dip
+            # print "\nAfter dip z pose: ",after_dip
+            # print "\nSuccessfully dipped!"
             return True
         else:
             self.staticDip()
@@ -386,9 +388,9 @@ class PickAndPlace(object):
         current_pose = group.get_current_pose().pose
         allow_replanning = True
         planning_time = 10
-        # print "Attempting to reach {},{},{}".format(self.target_location_x,
-        #                                             self.target_location_y,
-        #                                             current_pose.position.z)
+        print "\nAttempting to reach {},{},{}".format(self.target_location_x,
+                                                    self.target_location_y,
+                                                    current_pose.position.z + 0.01)
         threshold = 0.02
         status = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], self.target_location_x,
                                        self.target_location_y,
@@ -537,37 +539,37 @@ class PickAndPlace(object):
             rospy.sleep(0.05)
             view = self.go_to_joint_goal(joint_angles)
 
-        # print("reached viewpoint")
-        # print("Current pose: \n",group.get_current_pose())
-        # print("Current joint angles: \n", group.get_current_joint_values())
         return view
+
 
     def rotategripper(self, tolerance=0.01, goal_tol=0.01, orientation_tol=0.01):
 
-        clockwise = {'right_j0': 0.7716502133436203,
-                     'right_j1': -0.25253308083711357,
-                     'right_j2': -0.9156571119870254,
-                     'right_j3': 1.6775039734444164,
-                     'right_j4': 2.969104448028304,
-                     'right_j5': -2.2600790124759307,
-                     'right_j6': -2.608939978894689 + 3.1415926535}
+        group = self.group
+        current_joints = group.get_current_joint_values()
+        # print '\nCurrent Joints: \n',current_joints
+        
+        if (current_joints[6] + 3.1415926535) >= 4.712389:  # If rotating in one direction exceeds max angle(270), go the other way.
+            clockwise = {'right_j0': current_joints[0],
+                        'right_j1': current_joints[1],
+                        'right_j2': current_joints[2],
+                        'right_j3': current_joints[3],
+                        'right_j4': current_joints[4],
+                        'right_j5': current_joints[5],
+                        'right_j6': current_joints[6] - 3.1415926535}
+        else:
+            clockwise = {'right_j0': current_joints[0],
+                        'right_j1': current_joints[1],
+                        'right_j2': current_joints[2],
+                        'right_j3': current_joints[3],
+                        'right_j4': current_joints[4],
+                        'right_j5': current_joints[5],
+                        'right_j6': current_joints[6] + 3.1415926535}
+
         done = self.go_to_joint_goal(clockwise)
         rospy.sleep(0.01)
-        # print("Clockwise rotation done!")
-
-        # anticlockwise = {'right_j0': 0.7716502133436203,
-        #                  'right_j1': -0.25253308083711357,
-        #                  'right_j2': -0.9156571119870254,
-        #                  'right_j3': 1.6775039734444164,
-        #                  'right_j4': 2.969104448028304,
-        #                  'right_j5': -2.2600790124759307,
-        #                  'right_j6': -2.608939978894689}
-        # done = self.go_to_joint_goal(anticlockwise)
-        # rospy.sleep(0.01)
-        # print("Anticlockwise rotation done!")
 
         return done
-
+    
     def goto_bin(self, tolerance=0.01):
         #0.0007738188961337045, 0.9942022319650565, -0.6642366352730953, 0.46938807849915687, 1.5498016537213086, -0.8777244285593966, 0.8579252090846943, 2.18012354574336
 
@@ -575,15 +577,13 @@ class PickAndPlace(object):
         allow_replanning = True
         planning_time = 5
         reached = False
-        reached_waypoint = False
-        current_pose = group.get_current_pose().pose
-        height = current_pose.position.z
         # print "Attempting to reach the bin"
         while not reached:
-            reached = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], 0.1, 0.6, 0.1,
+            reached = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], 0.1, 0.6, 0.25,
                                            allow_replanning, planning_time, tolerance)
             rospy.sleep(0.02)
-        # print "Reached bin: ", reached
+
+        print "Reached bin: ", reached
         # current_pose = group.get_current_pose().pose
         # print "current_pose: " + str((current_pose))
         return reached
@@ -630,7 +630,13 @@ class PickAndPlace(object):
         allow_replanning = True
         planning_time = 2.5
         group = self.group
-        onConveyor = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], 0.85, -0.6, 0.15,
+        miny = -0.6
+        maxy = -0.4
+        minx = 0.65
+        maxx = 0.85
+        yval = miny + (maxy-miny)*random.random()
+        xval = minx + (maxx-minx)*random.random()
+        onConveyor = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], xval, yval, 0.15,
                                             allow_replanning, planning_time, tolerance)
         rospy.sleep(0.02)
         # current_pose = group.get_current_pose().pose
