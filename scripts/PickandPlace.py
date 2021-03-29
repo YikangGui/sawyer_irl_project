@@ -416,15 +416,15 @@ class PickAndPlace(object):
         position_constraint.target_point_offset.x = 0.1
         position_constraint.target_point_offset.y = 0.1
         position_constraint.target_point_offset.z = 0.5
-        position_constraint.weight = 0.15
+        position_constraint.weight = 0.1
         position_constraint.link_name = group.get_end_effector_link()
         position_constraint.header.frame_id = group.get_planning_frame()
         orientation_constraint = OrientationConstraint()
         orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
-        orientation_constraint.absolute_x_axis_tolerance = 0.35
-        orientation_constraint.absolute_y_axis_tolerance = 0.35
-        orientation_constraint.absolute_z_axis_tolerance = 0.35
-        orientation_constraint.weight = 0.5
+        orientation_constraint.absolute_x_axis_tolerance = 0.3
+        orientation_constraint.absolute_y_axis_tolerance = 0.3
+        orientation_constraint.absolute_z_axis_tolerance = 0.3
+        orientation_constraint.weight = 0.5   # Empirically estimated values for Sawyer Robot
         orientation_constraint.link_name = group.get_end_effector_link()
         orientation_constraint.header.frame_id = group.get_planning_frame()
 
@@ -433,7 +433,7 @@ class PickAndPlace(object):
         constraint.position_constraints.append(position_constraint)
         group.set_path_constraints(constraint)
         current_pose = group.get_current_pose().pose
-        allow_replanning = True
+        allow_replanning = False
         planning_time = 10
         lifted = False
         threshold = 0.05

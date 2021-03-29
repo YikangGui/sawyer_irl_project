@@ -1,0 +1,4 @@
+# this file belongs in /etc/udev/rules.d/
+# ATTR{product}=="robotiq-2f-85"
+SUBSYSTEM=="usb", ATTR{idVendor}=="0403", ATTR{idProduct}=="6015", ATTR{serial}=="DAUHCXQN", MODE="0666"
+SUBSYSTEM=="usb", ATTR{idVendor}=="1a40", ATTR{idProduct}=="0101", MODE="0666"

@@ -1,0 +1,38 @@
+<launch>
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="kinect2_bridge" />
+    <arg name="file" value="kinect2_bridge.launch" />
+  </include>
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="kinect2_bridge" />
+    <arg name="file" value="rviz_tf.launch" />
+  </include>
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="robotiq_2f_gripper_action_server" />
+    <arg name="file" value="robotiq_2f_gripper_action_server_rtu.launch" />
+  </include>
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="sawyer_irl_project" />
+    <arg name="file" value="upload_gripper.launch" />
+  </include>
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="sawyer_irl_project" />
+    <arg name="file" value="robot.launch" />
+  </include>
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="sawyer_moveit_config" />
+    <arg name="file" value="sawyer_moveit.launch" />
+    <arg name="value" value="rviz_gui:=True" />
+  </include> 
+  <include file="$(find timed_roslaunch)/timed_roslaunch.launch">
+    <arg name="time" value="5" />
+    <arg name="pkg" value="sawyer_irl_project" />
+    <arg name="file" value="policy_executor_physical.py" />
+  </include>
+</launch>

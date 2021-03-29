@@ -136,7 +136,7 @@ class Claim(State):
         print '\nMax index is = ', max_index
         pnp.onion_index = 0
         for i in range(max_index):
-            if userdata.y[i] > -0.35 and userdata.y[i] < 0.35:
+            if userdata.y[i] > -0.35 and userdata.y[i] < 0.25:
                 pnp.target_location_x = userdata.x[i]
                 pnp.target_location_y = userdata.y[i]
                 pnp.target_location_z = userdata.z[i]

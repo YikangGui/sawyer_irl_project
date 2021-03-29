@@ -116,9 +116,28 @@ The following are the steps to be followed to get this package working:
    [Workstation Setup](http://sdk.rethinkrobotics.com/intera/Workstation_Setup)
         
    - Make sure you are able to connect to the gripper using the following steps: (DO ALL THESE STEPS WITHIN THE ./intera.sh ENV, ALL IN NEW TERMINALS)
-        
+           
+=====================================================================================================
+
+### If you want to use the master launch file to run the whole setup at a time (which I don't recommend btw, because it makes debugging hard if something crashes):
+       
+   - Make sure you're in intera.sh environment and sequentially do the following:
+
          sudo chmod 777 /dev/ttyUSB0
-          
+
+         sudo apt install ros-<ros-distro>-timed-roslaunch
+
+         roslaunch sawyer_irl_project master_launch_physical_exp.launch
+
+
+   - The master launch file should be sufficient to run the whole thing, you don't need to do any of the steps that follow this.
+
+=====================================================================================================
+
+### Running the experiment the regular way:
+
+         sudo chmod 777 /dev/ttyUSB0
+       
          roslaunch robotiq_2f_gripper_action_server robotiq_2f_gripper_action_server_rtu.launch  (DRIVER FILE: Keep this running until the gripper is being used)
           
          rosrun robotiq_2f_gripper_control Robotiq2FGripperSimpleController.py 
@@ -129,7 +148,7 @@ The following are the steps to be followed to get this package working:
          
          roslaunch sawyer_irl_project robot.launch
          
-         roslaunch sawyer_moveit_config sawyer_moveit.launch
+         roslaunch sawyer_moveit_config sawyer_moveit.launch rviz_gui:=True
          
    - For obtaining coordinates using vision:
           Refer to [this link](https://github.com/thinclab/sanet_onionsorting/blob/master/README.md)
@@ -137,7 +156,4 @@ The following are the steps to be followed to get this package working:
    - For regular pick and place:
         
          rosrun sawyer_irl_project simple_pnp.py    (Make sure all files in this folder are set to executable in file properties)
-         
-   - For pick and place using vision:
-   
-          TO BE UPDATED
+
