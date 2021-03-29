@@ -33,11 +33,13 @@ from rgbd_imgpoint_to_tf import Camera
 pnp = PickAndPlace(init_node=False)
 current_state = 140
 done_onions = 0
-rgbtopic = '/kinect2/hd/image_color_rect'
-depthtopic = '/kinect2/hd/image_depth_rect'
-camerainfo = '/kinect2/hd/camera_info'
-choice = 'real'
-camera = Camera('kinectv2', rgbtopic, depthtopic, camerainfo, choice)
+# camera = None 
+
+
+# def getCameraInstance(camInstance):
+#     global camera
+#     camera = camInstance
+#     return
 
 def sid2vals(s, nOnionLoc=4, nEEFLoc=4, nPredict=3, nlistIDStatus=3):
     sid = s
@@ -66,12 +68,13 @@ class Get_info(State):
         self.z = []
         self.color = []
         self.is_updated = False
-        rospy.wait_for_service("/get_predictions")  # Contains the centroids of the obj bounding boxes
-        gip_service = rospy.ServiceProxy("/get_predictions", yolo_srv)
-        response = gip_service()
-        camera.save_response(response)
-        if camera.is_updated and camera.found_objects:    
-            camera.OblobsPublisher()
+        # rospy.wait_for_service("/get_predictions")  # Contains the centroids of the obj bounding boxes
+        # gip_service = rospy.ServiceProxy("/get_predictions", yolo_srv)
+        # response = gip_service()
+        # camera.save_response(response)
+        # print "\nIs updated: ",camera.is_updated,"\tFound objects: ", camera.found_objects
+        # if camera.is_updated and camera.found_objects:    
+        #     camera.OblobsPublisher()
         self.callback_vision(rospy.wait_for_message("/object_location", OBlobs))
 
     def callback_vision(self, msg):
@@ -80,8 +83,8 @@ class Get_info(State):
         self.y = msg.y
         self.z = msg.z
         self.color = msg.color
-        print '\nCallback data x,y,z in Get_info are: \n', self.x,self.y,self.z
-        rospy.sleep(5)
+        # print '\nCallback data x,y,z in Get_info are: \n', self.x,self.y,self.z
+        # rospy.sleep(5)
         self.is_updated = True
         return
 
@@ -274,13 +277,13 @@ class View(State):
 
     def execute(self, userdata):
         global pnp, current_state
-        rospy.loginfo('Executing state: View')
+        # rospy.loginfo('Executing state: View')
         if userdata.counter >= 50:
             userdata.counter = 0
             return 'timed_out'
          
         rotate = pnp.rotategripper(0.3)
-        rospy.sleep(0.01)
+        rospy.sleep(1)
         if rotate:
             userdata.counter = 0
             self.checkOnionColor()
@@ -297,14 +300,16 @@ class View(State):
             return 'failed'
 
     def checkOnionColor(self):
-        global camera
-        rospy.wait_for_service("/get_predictions")  # Contains the centroids of the obj bounding boxes
-        gip_service = rospy.ServiceProxy("/get_predictions", yolo_srv)
-        response = gip_service()
-        camera.save_response(response)
-        if camera.is_updated and camera.found_objects:    
-            camera.OblobsPublisher()
-        self.callback_prediction(rospy.wait_for_message("/object_location", OBlobs))
+        # global camera
+        # rospy.wait_for_service("/get_predictions")  # Contains the centroids of the obj bounding boxes
+        # gip_service = rospy.ServiceProxy("/get_predictions", yolo_srv)
+        # response = gip_service()
+        # camera.save_response(response)
+        # if camera.is_updated and camera.found_objects:    
+        #     camera.OblobsPublisher()
+
+        # self.callback_prediction(rospy.wait_for_message("/object_location", OBlobs))
+
         color = int(pnp.onion_color)
         if self.color == 0 and self.color != color:
             print '\nUpdating onion as blemished: ', self.color
@@ -315,17 +320,14 @@ class View(State):
 
     def callback_prediction(self, msg):
 
-        print '\nOnions z values: ', msg.z
-        rospy.sleep(100)
-
-        # if max(msg.z) < 0.8:    # This is freakin counterintuitive! Lifted onion should be  > 0.85. But this is how it is. Sad! :(
-        #     idx = msg.x.index(max(msg.x))
-        #     self.color = msg.color[idx]
-        #     print '\nCallback prediction color is: ', self.color
-        #     print '\nOnion z value: ', msg.z[idx]
-        # else:
-        #     print "\nCouldn't find the onion in hand\n"
-        #     print 'Here are the zs: \n', msg.z
+        if max(msg.z) > 0.85:
+            idx = msg.x.index(max(msg.x))
+            self.color = msg.color[idx]
+            print '\nFound onion in hand. Color is: ', self.color
+            print '\nOnion z value: ', msg.z[idx]
+        else:
+            print "\nCouldn't find the onion in hand\n"
+            print 'Here are the zs: \n', msg.z
 
 
 class Placeonconveyor(State):
@@ -401,7 +403,7 @@ class Detach_object(State):
             detach = gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
             if detach:
                 userdata.counter = 0
-                rospy.sleep(1)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
+                rospy.sleep(2)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
                 '''NOTE: Both place on conveyor and bin use this, so don't update current state here.'''
                 return 'success'
             else:

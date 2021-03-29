@@ -178,11 +178,16 @@ def PlaceOnConveyor():
 
 
 def main():
-    global current_state
     policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
     # print "\nI'm in main now!"
     ppv.rospy.init_node('policy_exec_phys', anonymous=True, disable_signals=False)
+    rgbtopic = '/kinect2/hd/image_color_rect'
+    depthtopic = '/kinect2/hd/image_depth_rect'
+    camerainfo = '/kinect2/hd/camera_info'
+    choice = 'real'
+    # camera = ppv.Camera('kinectv2', rgbtopic, depthtopic, camerainfo, choice)
+    # ppv.getCameraInstance(camera)
     outcome = actList[4]()      
     while not ppv.rospy.is_shutdown() and outcome != 'SORT COMPLETE':
         print '\n OUTCOME: ', outcome
