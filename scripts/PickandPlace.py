@@ -386,7 +386,7 @@ class PickAndPlace(object):
         while self.target_location_x == -100:
             rospy.sleep(0.05)
         current_pose = group.get_current_pose().pose
-        allow_replanning = True
+        allow_replanning = False
         planning_time = 10
         # print "\nAttempting to reach {},{},{}".format(self.target_location_x,
         #                                             self.target_location_y,
@@ -436,7 +436,7 @@ class PickAndPlace(object):
         allow_replanning = False
         planning_time = 10
         lifted = False
-        threshold = 0.05
+        threshold = 0.08
         # print "Current z pose: ", current_pose.position.z
         z_pose = current_pose.position.z + 0.25
         while not lifted:
@@ -574,7 +574,7 @@ class PickAndPlace(object):
         #0.0007738188961337045, 0.9942022319650565, -0.6642366352730953, 0.46938807849915687, 1.5498016537213086, -0.8777244285593966, 0.8579252090846943, 2.18012354574336
 
         group = self.group
-        allow_replanning = True
+        allow_replanning = False
         planning_time = 5
         reached = False
         # print "Attempting to reach the bin"
@@ -627,8 +627,8 @@ class PickAndPlace(object):
     def placeOnConveyor(self, tolerance=0.05, goal_tol=0.01, orientation_tol=0.01):
 
         onConveyor = False
-        allow_replanning = True
-        planning_time = 2.5
+        allow_replanning = False
+        planning_time = 5
         group = self.group
         miny = -0.6
         maxy = -0.4

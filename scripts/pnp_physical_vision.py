@@ -233,7 +233,7 @@ class Grasp_object(State):
             userdata.counter = 0
             return 'timed_out'
 
-        gr = gripper_to_pos(60, 60, 200, False)    # GRIPPER TO POSITION 60
+        gr = gripper_to_pos(75, 60, 200, False)    # GRIPPER TO POSITION 60
         rospy.sleep(2)
         if gr:
             userdata.counter = 0
@@ -403,7 +403,7 @@ class Detach_object(State):
             detach = gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
             if detach:
                 userdata.counter = 0
-                rospy.sleep(2)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
+                # rospy.sleep(2)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
                 '''NOTE: Both place on conveyor and bin use this, so don't update current state here.'''
                 return 'success'
             else:
