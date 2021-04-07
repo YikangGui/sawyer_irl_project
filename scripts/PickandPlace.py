@@ -188,7 +188,7 @@ class PickAndPlace(object):
         group.stop()
         return True
 
-    def go_to_pose_goal(self, ox, oy, oz, ow, px, py, pz, allow_replanning=True, planning_time=10.0, thresh = 0.05):
+    def go_to_pose_goal(self, ox, oy, oz, ow, px, py, pz, allow_replanning=True, planning_time=10.0, thresh = 0.025):
 
         group = self.group
         # Allow some leeway in position(meters) and orientation (radians)
@@ -334,7 +334,28 @@ class PickAndPlace(object):
         dip = self.dip()
         return dip
 
-    def staticDip(self, z_pose = 0.1, tolerance=0.05):
+    def goAndPick(self):
+
+        group = self.group
+        while self.target_location_x == -100:
+            rospy.sleep(0.05)
+        current_pose = group.get_current_pose().pose
+        allow_replanning = False
+        planning_time = 10
+        # print "\nAttempting to reach {},{},{}".format(self.target_location_x,
+        #                                             self.target_location_y,
+        #                                             current_pose.position.z + 0.01)
+        threshold = 0.02
+        status = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], self.target_location_x,
+                                       self.target_location_y,
+                                       current_pose.position.z,      # - 0.045,
+                                       allow_replanning, planning_time, threshold)
+        rospy.sleep(0.05)
+        # dip = self.staticDip()
+        # return dip
+        return status
+
+    def staticDip(self, z_pose = 0.1, tolerance=0.055):
         
         group = self.group
         current_pose = group.get_current_pose().pose
@@ -363,10 +384,10 @@ class PickAndPlace(object):
         before_dip = current_pose.position.z
         # dip = False
         # while not dip: 
-        dip = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], self.target_location_x + 0.01,  # accounting for tolerance error
+        dip = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], self.target_location_x,  # accounting for tolerance error
                                 self.target_location_y,  # accounting for tolerance error
                                 z_pose,  # This is where we dip
-                                allow_replanning, planning_time, tolerance/5)
+                                allow_replanning, planning_time, tolerance/3)
         # current_pose = group.get_current_pose().pose
         rospy.sleep(0.01)
         group.clear_path_constraints()
@@ -380,28 +401,8 @@ class PickAndPlace(object):
             self.staticDip()
         # return True
 
-    def goAndPick(self):
 
-        group = self.group
-        while self.target_location_x == -100:
-            rospy.sleep(0.05)
-        current_pose = group.get_current_pose().pose
-        allow_replanning = False
-        planning_time = 10
-        # print "\nAttempting to reach {},{},{}".format(self.target_location_x,
-        #                                             self.target_location_y,
-        #                                             current_pose.position.z + 0.01)
-        threshold = 0.02
-        status = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], self.target_location_x,
-                                       self.target_location_y,
-                                       current_pose.position.z + 0.01,      # - 0.045,
-                                       allow_replanning, planning_time, threshold)
-        rospy.sleep(0.05)
-        # dip = self.staticDip()
-        # return dip
-        return status
-
-    def liftgripper(self):
+    def liftgripper(self, threshold = 0.025):
         # approx centers of onions at 0.82, width of onion is 0.038 m. table is at 0.78
         # length of gripper is 0.163 m The gripper should not go lower than
         # (height_z of table w.r.t base+gripper-height/2+tolerance) = 0.78-0.93+0.08+0.01=-0.24
@@ -421,9 +422,9 @@ class PickAndPlace(object):
         position_constraint.header.frame_id = group.get_planning_frame()
         orientation_constraint = OrientationConstraint()
         orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
-        orientation_constraint.absolute_x_axis_tolerance = 0.3
-        orientation_constraint.absolute_y_axis_tolerance = 0.3
-        orientation_constraint.absolute_z_axis_tolerance = 0.3
+        orientation_constraint.absolute_x_axis_tolerance = 0.25
+        orientation_constraint.absolute_y_axis_tolerance = 0.25
+        orientation_constraint.absolute_z_axis_tolerance = 0.25
         orientation_constraint.weight = 0.5   # Empirically estimated values for Sawyer Robot
         orientation_constraint.link_name = group.get_end_effector_link()
         orientation_constraint.header.frame_id = group.get_planning_frame()
@@ -436,13 +437,12 @@ class PickAndPlace(object):
         allow_replanning = False
         planning_time = 10
         lifted = False
-        threshold = 0.08
         # print "Current z pose: ", current_pose.position.z
         z_pose = current_pose.position.z + 0.25
         while not lifted:
-            lifted = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], self.target_location_x,
+            lifted = self.go_to_pose_goal(self.q[0], self.q[1], self.q[2], self.q[3], current_pose.position.x,
                                            current_pose.position.y, 
-                                           current_pose.position.z + 0.25,
+                                           z_pose,
                                            allow_replanning, planning_time, threshold)
             # current_pose = group.get_current_pose().pose
             rospy.sleep(0.01)
@@ -472,16 +472,15 @@ class PickAndPlace(object):
 
         # print("Attempting to reach home\n")
         group = self.group
-        home_joint_angles = [-0.041662954890248294, -1.0258291091425074, 0.0293680414401436,
-                             2.17518162913313, -0.06703022873354225, 0.3968371433926965, 1.7659649178699421]
+        home_joint_angles = [-0.040330078125, -1.1118330078125, 0.0276318359375, 2.1849912109375, -0.0525625, 0.4793486328125, 1.7502451171875]
 
-        joint_angles = {'right_j0': -0.041662954890248294,
-                        'right_j1': -1.0258291091425074,
-                        'right_j2': 0.0293680414401436,
-                        'right_j3': 2.17518162913313,
-                        'right_j4': -0.06703022873354225,
-                        'right_j5': 0.3968371433926965,
-                        'right_j6': 1.7659649178699421}
+        joint_angles = {'right_j0': -0.040330078125,
+                        'right_j1': -1.1118330078125,
+                        'right_j2': 0.0276318359375,
+                        'right_j3': 2.1849912109375,
+                        'right_j4': -0.0525625,
+                        'right_j5': 0.4793486328125,
+                        'right_j6': 1.7502451171875}
         # 0.7716502133436203, -0.25253308083711357, -0.9156571119870254, 1.6775039734444164, 2.969104448028304, -2.2600790124759307, -2.608939978894689
         current_joints = self.group.get_current_joint_values()
         tol = tolerance

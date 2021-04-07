@@ -27,17 +27,17 @@ def main():
     # gripper_to_pos(0, 60, 200, False)    # OPEN GRIPPER
 
     # rospy.sleep(1.0)
+    gripper_to_pos(255, 255, 200, False)    # GRIPPER TO POSITION 50
     group = pnp.group
     current_pose = group.get_current_pose().pose
     allow_replanning = True
     planning_time = 10
     status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75,
                                        0,
-                                       current_pose.position.z,     
-                                       allow_replanning, planning_time)
+                                       0.1,     
+                                       allow_replanning, planning_time, thresh = 0.001)
     rospy.sleep(0.1)
     print "\n",group.get_current_pose().pose.position
-    # gripper_to_pos(255, 60, 200, False)    # GRIPPER TO POSITION 50
 
   except rospy.ROSInterruptException:
     return

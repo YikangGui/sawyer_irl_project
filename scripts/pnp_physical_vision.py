@@ -136,17 +136,21 @@ class Claim(State):
         print '\nMax index is = ', max_index
         pnp.onion_index = 0
         for i in range(max_index):
-            if userdata.y[i] > -0.35 and userdata.y[i] < 0.25:
-                pnp.target_location_x = userdata.x[i]
-                pnp.target_location_y = userdata.y[i]
-                pnp.target_location_z = userdata.z[i]
-                pnp.onion_color = userdata.color[i]
-                pnp.onion_index = i
-                self.is_updated = True
-                break
+            if len(userdata.y) >= i:
+                if userdata.y[i] > -0.35 and userdata.y[i] < 0.25:
+                    pnp.target_location_x = userdata.x[i]
+                    pnp.target_location_y = userdata.y[i]
+                    pnp.target_location_z = userdata.z[i]
+                    pnp.onion_color = userdata.color[i]
+                    pnp.onion_index = i
+                    self.is_updated = True
+                    break
+                else:
+                    done_onions += 1
+                    print '\nDone onions = ', done_onions
             else:
-                done_onions += 1
-                print '\nDone onions = ', done_onions
+                print '\nSort complete!'
+                return 'completed'
 
         if max_index == done_onions:
             print '\nAll onions are sorted!'
@@ -210,7 +214,7 @@ class Dipdown(State):
             userdata.counter = 0
             return 'timed_out'
 
-        dip = pnp.staticDip(z_pose=0.09)
+        dip = pnp.staticDip(z_pose=0.108)
         rospy.sleep(0.1)
         if dip:
             userdata.counter = 0
@@ -403,7 +407,7 @@ class Detach_object(State):
             detach = gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
             if detach:
                 userdata.counter = 0
-                # rospy.sleep(2)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
+                rospy.sleep(2)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
                 '''NOTE: Both place on conveyor and bin use this, so don't update current state here.'''
                 return 'success'
             else:

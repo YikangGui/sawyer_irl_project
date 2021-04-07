@@ -158,15 +158,15 @@ def PlaceOnConveyor():
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'color': 'sm_color','counter':'sm_counter'})
             ppv.StateMachine.add('DETACH', ppv.Detach_object(),
-                            transitions={'success':'LIFTUP', 
+                            transitions={'success':'SUCCEEDED', 
                                         'failed':'DETACH',
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'counter':'sm_counter'})
-            ppv.StateMachine.add('LIFTUP', ppv.Liftup(),
-                        transitions={'success': 'SUCCEEDED', 
-                                    'failed':'LIFTUP',
-                                    'timed_out': 'TIMED_OUT'},
-                        remapping={'counter':'sm_counter'})
+            # ppv.StateMachine.add('LIFTUP', ppv.Liftup(),
+            #             transitions={'success': 'SUCCEEDED', 
+            #                         'failed':'LIFTUP',
+            #                         'timed_out': 'TIMED_OUT'},
+            #             remapping={'counter':'sm_counter'})
         # Execute SMACH plan
         outcome_place = PlaceOnConveyor.execute()
         return outcome_place
