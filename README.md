@@ -119,7 +119,7 @@ The following are the steps to be followed to get this package working:
            
 =====================================================================================================
 
-### If you want to use the master launch file to run the whole setup at a time (which I don't recommend btw, because it makes debugging hard if something crashes):
+### THIS IS STILL UNDER CONSTRUCTION. PLEASE MOVE TO THE NEXT PART. If you want to use the master launch file to run the whole setup at a time (which I don't recommend btw, because it makes debugging hard if something crashes):
        
    - Make sure you're in intera.sh environment and sequentially do the following:
 
