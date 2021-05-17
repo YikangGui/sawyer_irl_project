@@ -17,25 +17,24 @@ pnp = PickAndPlace()
 def main():
   try:
 
-    pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
+    # pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
   
-    reset_gripper()
+    # reset_gripper()
 
-    activate_gripper()
+    # activate_gripper()
 
   #   # 255 = closed, 0 = open
     # gripper_to_pos(0, 60, 200, False)    # OPEN GRIPPER
 
     # rospy.sleep(1.0)
-    gripper_to_pos(255, 255, 200, False)    # GRIPPER TO POSITION 50
+    # gripper_to_pos(255, 255, 200, False)    # GRIPPER TO POSITION 50
     group = pnp.group
     current_pose = group.get_current_pose().pose
     allow_replanning = True
     planning_time = 10
-    status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75,
-                                       0,
-                                       0.1,     
-                                       allow_replanning, planning_time, thresh = 0.001)
+    # state = pnp.robot.get_current_state()
+    # group.set_start_state(state)
+    status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75, 0.0, 0.12, allow_replanning, planning_time, thresh = 0.001)
     rospy.sleep(0.1)
     print "\n",group.get_current_pose().pose.position
 

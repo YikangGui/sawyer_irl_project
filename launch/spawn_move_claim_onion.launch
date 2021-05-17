@@ -31,8 +31,8 @@
     <rosparam command="load" file="$(find sawyer_moveit_config)/config/kinematics.yaml"/>
   </node>
 
-  <node name="onion_blocks_spawner" pkg="sawyer_irl_project" type="onion_blocks_spawner" output="screen">
-  </node>
+  <!--node name="onion_blocks_spawner" pkg="sawyer_irl_project" type="onion_blocks_spawner" output="screen">
+  </node-->
 
   <!--node name="onion_blocks_poses_publisher" pkg="sawyer_irl_project" type="onion_blocks_poses_publisher" output="screen" /-->
 

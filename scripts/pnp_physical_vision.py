@@ -27,7 +27,7 @@ rospack = rospkg.RosPack()  # get an instance of RosPack with the default search
 path = rospack.get_path('sanet_onionsorting')
 sys.path.append(path + '/scripts/')
 
-from rgbd_imgpoint_to_tf import Camera
+# from rgbd_imgpoint_to_tf import Camera
 
 # Global initializations
 pnp = PickAndPlace(init_node=False)
@@ -59,7 +59,7 @@ def vals2sid(ol, eefl, pred, listst, nOnionLoc=4, nEEFLoc=4, nPredict=3, nlistID
 
 class Get_info(State):
     def __init__(self):
-        global camera
+        # global camera
         State.__init__(self, outcomes=['updated', 'not_updated', 'timed_out', 'completed'],
                        input_keys=['x', 'y', 'z', 'color', 'counter'],
                        output_keys=['x', 'y', 'z', 'color', 'counter'])
@@ -137,17 +137,21 @@ class Claim(State):
         pnp.onion_index = 0
         for i in range(max_index):
             if len(userdata.y) >= i:
-                if userdata.y[i] > -0.35 and userdata.y[i] < 0.25:
-                    pnp.target_location_x = userdata.x[i]
-                    pnp.target_location_y = userdata.y[i]
-                    pnp.target_location_z = userdata.z[i]
-                    pnp.onion_color = userdata.color[i]
-                    pnp.onion_index = i
-                    self.is_updated = True
-                    break
-                else:
-                    done_onions += 1
-                    print '\nDone onions = ', done_onions
+                try:
+                    if userdata.y[i] > -0.35 and userdata.y[i] < 0.25:
+                        pnp.target_location_x = userdata.x[i]
+                        pnp.target_location_y = userdata.y[i]
+                        pnp.target_location_z = userdata.z[i]
+                        pnp.onion_color = userdata.color[i]
+                        pnp.onion_index = i
+                        self.is_updated = True
+                        break
+                    else:
+                        done_onions += 1
+                        print '\nDone onions = ', done_onions
+
+                except IndexError:
+                    pass
             else:
                 print '\nSort complete!'
                 return 'completed'
@@ -184,7 +188,8 @@ class Approach(State):
             userdata.counter = 0
             return 'timed_out'
 
-        home = pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
+        # home = pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
+        home = True
         gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
         rospy.sleep(0.1)
         if home:
@@ -214,7 +219,7 @@ class Dipdown(State):
             userdata.counter = 0
             return 'timed_out'
 
-        dip = pnp.staticDip(z_pose=0.108)
+        dip = pnp.staticDip(z_pose=0.105)
         rospy.sleep(0.1)
         if dip:
             userdata.counter = 0
@@ -282,15 +287,31 @@ class View(State):
     def execute(self, userdata):
         global pnp, current_state
         # rospy.loginfo('Executing state: View')
-        if userdata.counter >= 50:
+        if userdata.counter >= 3:
             userdata.counter = 0
             return 'timed_out'
-         
-        rotate = pnp.rotategripper(0.3)
-        rospy.sleep(1)
-        if rotate:
-            userdata.counter = 0
-            self.checkOnionColor()
+        
+        if pnp.onion_color == 1:    # Inspect further only if it is an unblemished one
+            rotate = pnp.rotategripper(0.3)
+            rospy.sleep(2)
+            if rotate:
+                print("\nSuccessfully Rotated!")
+                self.checkOnionColor()
+                if self.color != None:
+                    current_state = int(vals2sid(ol=1, eefl=1, pred=self.color, listst=2))
+                    print '\nCurrent state is: ', current_state
+                    # rospy.sleep(100)
+                    userdata.counter = 0
+                    return 'success'
+                else:
+                    # print("\nCurrent repeat count is: ",userdata.counter)
+                    userdata.counter += 1
+                    return 'failed'
+            else:
+                userdata.counter += 1
+                return 'failed'
+        else:                   # Otherwise, directly go to the bin
+            self.color = int(pnp.onion_color)
             if self.color != None:
                 current_state = int(vals2sid(ol=1, eefl=1, pred=self.color, listst=2))
                 print '\nCurrent state is: ', current_state
@@ -299,9 +320,6 @@ class View(State):
             else:
                 userdata.counter += 1
                 return 'failed'
-        else:
-            userdata.counter += 1
-            return 'failed'
 
     def checkOnionColor(self):
         # global camera
@@ -312,19 +330,20 @@ class View(State):
         # if camera.is_updated and camera.found_objects:    
         #     camera.OblobsPublisher()
 
-        # self.callback_prediction(rospy.wait_for_message("/object_location", OBlobs))
+        self.callback_prediction(rospy.wait_for_message("/object_location", OBlobs))
 
         color = int(pnp.onion_color)
-        if self.color == 0 and self.color != color:
-            print '\nUpdating onion as blemished: ', self.color
-        else:
-            print '\nRetaining onion color as: ', color
-            self.color = color
-
+        if self.color != None:
+            if self.color != color:
+                print '\nUpdating onion as blemished: ', self.color
+            else:
+                print '\nRetaining onion color as: ', color
+                self.color = color
+        else: pass
 
     def callback_prediction(self, msg):
 
-        if max(msg.z) > 0.85:
+        if max(msg.z) >= 0.85:
             idx = msg.x.index(max(msg.x))
             self.color = msg.color[idx]
             print '\nFound onion in hand. Color is: ', self.color

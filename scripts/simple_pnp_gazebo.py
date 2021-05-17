@@ -189,26 +189,37 @@ def callback_onion_roll(color_indices_msg):
 def main():
     print("I'm in main!")
     try:
-        if len(sys.argv) < 2:
-            sortmethod = "pick"   # Default sort method
-        else:
-            sortmethod = sys.argv[1]
-        if(sortmethod == "pick"):
-            print("Pick method selected")
-            rospy.Subscriber("current_onions_blocks",
-                             Int8MultiArray, callback_onion_pick)
-        elif(sortmethod == "roll"):
-            print("Roll method selected")
-            rospy.Subscriber("current_onions_blocks",
-                             Int8MultiArray, callback_onion_roll)
-            # pass
-        rospy.Subscriber("onions_blocks_poses",
-                         onions_blocks_poses, callback_poses)
-        #########################################################################################
-        # callback_onion_pick(rospy.wait_for_message("current_onions_blocks", Int8MultiArray))  #
-        # If you're using this method, it will onpnp.req.model_name_1 = Nonely listen once until it hears something,      #
-        # this may cause trouble later, watch out!                                            #
-        #######################################################################################
+        # if len(sys.argv) < 2:
+        #     sortmethod = "pick"   # Default sort method
+        # else:
+        #     sortmethod = sys.argv[1]
+        # if(sortmethod == "pick"):
+        #     print("Pick method selected")
+        #     rospy.Subscriber("current_onions_blocks",
+        #                      Int8MultiArray, callback_onion_pick)
+        # elif(sortmethod == "roll"):
+        #     print("Roll method selected")
+        #     rospy.Subscriber("current_onions_blocks",
+        #                      Int8MultiArray, callback_onion_roll)
+        #     # pass
+        # rospy.Subscriber("onions_blocks_poses",
+        #                  onions_blocks_poses, callback_poses)
+        # #########################################################################################
+        # # callback_onion_pick(rospy.wait_for_message("current_onions_blocks", Int8MultiArray))  #
+        # # If you're using this method, it will onpnp.req.model_name_1 = Nonely listen once until it hears something,      #
+        # # this may cause trouble later, watch out!                                            #
+        # #######################################################################################
+
+        # pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
+  
+        group = pnp.group
+        current_pose = group.get_current_pose().pose
+        allow_replanning = False
+        planning_time = 5
+        status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75, 0.0, 0.2, allow_replanning, planning_time, thresh = 0.001)
+        rospy.sleep(0.1)
+        print "\n",group.get_current_pose().pose.position
+
 
     except rospy.ROSInterruptException:
         return

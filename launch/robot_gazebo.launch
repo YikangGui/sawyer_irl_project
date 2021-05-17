@@ -25,13 +25,13 @@
   <arg name="load_gazebo" default="true"/>
   <!-- This argument sets the initial joint states -->
   <arg name="initial_joint_states"
-    default=" -J sawyer::right_j0 -0.27
-              -J sawyer::right_j1 1.05
-              -J sawyer::right_j2 0.00
-              -J sawyer::right_j3 0.49
-              -J sawyer::right_j4 -0.08
-              -J sawyer::right_j5 -0.06
-              -J sawyer::right_j6 0.027
+    default=" -J sawyer::right_j0 -0.040330078125
+              -J sawyer::right_j1 -1.1118330078125
+              -J sawyer::right_j2 0.0276318359375
+              -J sawyer::right_j3 2.1849912109375
+              -J sawyer::right_j4 -0.0525625
+              -J sawyer::right_j5 0.4793486328125
+              -J sawyer::right_j6 1.7502451171875
               -J sawyer::head_pan 0.00"/>
   
   <!-- Custom arguments -->

@@ -18,7 +18,7 @@
 
   <!-- Load the URDF into the ROS Parameter Server -->
   <!-- Conveyor spawning in gazebo -->
- <param name="robot_description" command="$(find xacro)/xacro $(find sawyer_irl_project)/urdf/conveyor.urdf.xacro gazebo:=true"/> 
+ <param name="robot_description" command="$(find xacro)/xacro $(find sawyer_irl_project)/urdf/conveyor_g_path.urdf.xacro gazebo:=true"/> 
  <node args="-urdf -param robot_description -model conveyor_table" name="spawn_conveyor" output="screen" pkg="gazebo_ros" respawn="false" type="spawn_model"/>
 
   <!-- ros_control rrbot launch file -->

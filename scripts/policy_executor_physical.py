@@ -188,7 +188,8 @@ def main():
     choice = 'real'
     # camera = ppv.Camera('kinectv2', rgbtopic, depthtopic, camerainfo, choice)
     # ppv.getCameraInstance(camera)
-    outcome = actList[4]()      
+    ppv.pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
+    outcome = actList[4]()    
     while not ppv.rospy.is_shutdown() and outcome != 'SORT COMPLETE':
         print '\n OUTCOME: ', outcome
         # ppv.rospy.sleep(10)
@@ -196,6 +197,9 @@ def main():
             print '\nCurrent state is: ',ppv.current_state
             print '\nExecuting action: ',policy[ppv.current_state]
             outcome = actList[policy[ppv.current_state]]()
+            if outcome == 'TIMED_OUT':
+                print("\nTimed out, so going back to claim again!")
+                outcome = actList[4]()
         except ppv.rospy.ROSInterruptException:
             ppv.rospy.signal_shutdown("Shutting down node, ROS interrupt received!")
         except KeyboardInterrupt:

@@ -6,9 +6,9 @@
 <!-- Do not edit/replicate without permission -->
 
   <include file="$(find sawyer_irl_project)/launch/robot_gazebo.launch">
-    <arg name="robotiqgripper" default="true"/>
-    <arg name="launchconveyor" value="true"/>
-    <arg name="onion_bin" value="true"/>
+    <arg name="robotiqgripper" default="false"/>
+    <arg name="launchconveyor" value="false"/>
+    <arg name="onion_bin" value="false"/>
     <arg name="use_cylinder_end" value="false"/>
     <arg name="launchmoveit" value="false"/>	<!-- Moveit is being launched from the spawn onion launch file.
 						     So, as long as you are running that, make sure to set this to false -->
