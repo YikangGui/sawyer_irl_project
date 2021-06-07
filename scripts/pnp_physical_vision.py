@@ -255,7 +255,8 @@ class Grasp_object(State):
 
 class Liftup(State):
     def __init__(self):
-        State.__init__(self, outcomes=['success', 'failed', 'timed_out'],
+        self.grasp = True
+        State.__init__(self, outcomes=['success', 'failed', 'no_grasp', 'timed_out'],
                        input_keys=['counter'],
                        output_keys=['counter'])
 
@@ -269,12 +270,30 @@ class Liftup(State):
             lift = pnp.liftgripper()
             rospy.sleep(0.05)
             if lift:
-                userdata.counter = 0
-                '''NOTE: Both place on conveyor and pick use this, so don't update current state here.'''
-                return 'success'
+                self.callback_graspCheck(rospy.wait_for_message("/object_location", OBlobs))
+                if self.grasp == False:
+                    return 'no_grasp'
+                else:
+                    print "\nSuccessfully grasped and lifted"
+                    userdata.counter = 0
+                    '''NOTE: Both place on conveyor and pick use this, so don't update current state here.'''
+                    return 'success'
             else:
                 userdata.counter += 1
                 return 'failed'
+
+    def callback_graspCheck(self, msg):
+        for i in range(len(msg.x)):
+            if pnp.target_location_z - 0.05 <= msg.z[i] <= pnp.target_location_z + 0.05:
+                print "\nZ value that matched: ", msg.z[i]
+                if pnp.target_location_x - 0.05 <= msg.x[i] <= pnp.target_location_x + 0.05:
+                    print "\nX value that matched: ",msg.x[i] 
+                    if pnp.target_location_y - 0.05 <= msg.y[i] <= pnp.target_location_y + 0.05:
+                        print "\nY value that matched: ",msg.y[i]
+                        # rospy.sleep(20)
+                        self.grasp = False
+                    else: print "\nY value didn't match"
+                else: print "\nX value didn't match"
 
 
 class View(State):
@@ -287,19 +306,21 @@ class View(State):
     def execute(self, userdata):
         global pnp, current_state
         # rospy.loginfo('Executing state: View')
-        if userdata.counter >= 3:
+        if userdata.counter >= 2:
             userdata.counter = 0
             return 'timed_out'
         
         if pnp.onion_color == 1:    # Inspect further only if it is an unblemished one
+            print "\nChecking color before rotation"
+            self.checkOnionColor()
             rotate = pnp.rotategripper(0.3)
-            rospy.sleep(2)
+            rospy.sleep(1)
             if rotate:
-                print("\nSuccessfully Rotated!")
+                print "\nSuccessfully Rotated!"
                 self.checkOnionColor()
                 if self.color != None:
                     current_state = int(vals2sid(ol=1, eefl=1, pred=self.color, listst=2))
-                    print '\nCurrent state is: ', current_state
+                    print "\nCurrent state is: ", current_state
                     # rospy.sleep(100)
                     userdata.counter = 0
                     return 'success'
@@ -314,7 +335,7 @@ class View(State):
             self.color = int(pnp.onion_color)
             if self.color != None:
                 current_state = int(vals2sid(ol=1, eefl=1, pred=self.color, listst=2))
-                print '\nCurrent state is: ', current_state
+                print "\nCurrent state is: ", current_state
                 # rospy.sleep(100)
                 return 'success'
             else:
@@ -334,8 +355,8 @@ class View(State):
 
         color = int(pnp.onion_color)
         if self.color != None:
-            if self.color != color:
-                print '\nUpdating onion as blemished: ', self.color
+            if self.color != color and self.color == 0:
+                print '\nUpdating onion color as: ', self.color
             else:
                 print '\nRetaining onion color as: ', color
                 self.color = color
@@ -347,10 +368,10 @@ class View(State):
             idx = msg.x.index(max(msg.x))
             self.color = msg.color[idx]
             print '\nFound onion in hand. Color is: ', self.color
-            print '\nOnion z value: ', msg.z[idx]
+            # print '\nOnion z value: ', msg.z[idx]
         else:
             print "\nCouldn't find the onion in hand\n"
-            print 'Here are the zs: \n', msg.z
+            # print 'Here are the zs: \n', msg.z
 
 
 class Placeonconveyor(State):

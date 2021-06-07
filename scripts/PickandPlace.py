@@ -55,8 +55,8 @@ class PickAndPlace(object):
 
         group = moveit_commander.MoveGroupCommander(group_name, wait_for_servers=5.0)
         # See ompl_planning.yaml for a complete list
-        # group.set_planner_id("RRTConnectkConfigDefault")
-        group.set_planner_id("TRRTkConfigDefault")
+        group.set_planner_id("RRTConnectkConfigDefault")
+        # group.set_planner_id("TRRTkConfigDefault")
 
         display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
                                                        moveit_msgs.msg.DisplayTrajectory,
@@ -360,26 +360,26 @@ class PickAndPlace(object):
         
         group = self.group
         current_pose = group.get_current_pose().pose
-        # position_constraint = PositionConstraint()
-        # position_constraint.target_point_offset.x = 0.1
-        # position_constraint.target_point_offset.y = 0.1
-        # position_constraint.target_point_offset.z = 0.5
-        # position_constraint.weight = 0.25
-        # position_constraint.link_name = group.get_end_effector_link()
-        # position_constraint.header.frame_id = group.get_planning_frame()
-        # orientation_constraint = OrientationConstraint()
-        # orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
-        # orientation_constraint.absolute_x_axis_tolerance = 0.3
-        # orientation_constraint.absolute_y_axis_tolerance = 0.3
-        # orientation_constraint.absolute_z_axis_tolerance = 0.3
-        # orientation_constraint.weight = 0.5
-        # orientation_constraint.link_name = group.get_end_effector_link()
-        # orientation_constraint.header.frame_id = group.get_planning_frame()
+        position_constraint = PositionConstraint()
+        position_constraint.target_point_offset.x = 0.1
+        position_constraint.target_point_offset.y = 0.1
+        position_constraint.target_point_offset.z = 0.5
+        position_constraint.weight = 0.25
+        position_constraint.link_name = group.get_end_effector_link()
+        position_constraint.header.frame_id = group.get_planning_frame()
+        orientation_constraint = OrientationConstraint()
+        orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
+        orientation_constraint.absolute_x_axis_tolerance = 0.3
+        orientation_constraint.absolute_y_axis_tolerance = 0.3
+        orientation_constraint.absolute_z_axis_tolerance = 0.3
+        orientation_constraint.weight = 0.5
+        orientation_constraint.link_name = group.get_end_effector_link()
+        orientation_constraint.header.frame_id = group.get_planning_frame()
 
-        # constraint = Constraints()
-        # constraint.orientation_constraints.append(orientation_constraint)
-        # constraint.position_constraints.append(position_constraint)
-        # group.set_path_constraints(constraint)
+        constraint = Constraints()
+        constraint.orientation_constraints.append(orientation_constraint)
+        constraint.position_constraints.append(position_constraint)
+        group.set_path_constraints(constraint)
         allow_replanning = False
         planning_time = 10
         before_dip = current_pose.position.z
@@ -391,7 +391,7 @@ class PickAndPlace(object):
                                 allow_replanning, planning_time, tolerance/3)
         # current_pose = group.get_current_pose().pose
         rospy.sleep(0.01)
-        # group.clear_path_constraints()
+        group.clear_path_constraints()
         after_dip = group.get_current_pose().pose.position.z
         if dip and (before_dip > after_dip):
             # print "\nBefore dip z pose: ",before_dip
@@ -414,26 +414,26 @@ class PickAndPlace(object):
         group = self.group
         while self.target_location_x == -100:
             rospy.sleep(0.05)
-        # position_constraint = PositionConstraint()
-        # position_constraint.target_point_offset.x = 0.1
-        # position_constraint.target_point_offset.y = 0.1
-        # position_constraint.target_point_offset.z = 0.5
-        # position_constraint.weight = 0.25
-        # position_constraint.link_name = group.get_end_effector_link()
-        # position_constraint.header.frame_id = group.get_planning_frame()
-        # orientation_constraint = OrientationConstraint()
-        # orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
-        # orientation_constraint.absolute_x_axis_tolerance = 0.3
-        # orientation_constraint.absolute_y_axis_tolerance = 0.3
-        # orientation_constraint.absolute_z_axis_tolerance = 0.3
-        # orientation_constraint.weight = 0.5   # Empirically estimated values for Sawyer Robot
-        # orientation_constraint.link_name = group.get_end_effector_link()
-        # orientation_constraint.header.frame_id = group.get_planning_frame()
+        position_constraint = PositionConstraint()
+        position_constraint.target_point_offset.x = 0.1
+        position_constraint.target_point_offset.y = 0.1
+        position_constraint.target_point_offset.z = 0.5
+        position_constraint.weight = 0.25
+        position_constraint.link_name = group.get_end_effector_link()
+        position_constraint.header.frame_id = group.get_planning_frame()
+        orientation_constraint = OrientationConstraint()
+        orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
+        orientation_constraint.absolute_x_axis_tolerance = 0.3
+        orientation_constraint.absolute_y_axis_tolerance = 0.3
+        orientation_constraint.absolute_z_axis_tolerance = 0.3
+        orientation_constraint.weight = 0.5   # Empirically estimated values for Sawyer Robot
+        orientation_constraint.link_name = group.get_end_effector_link()
+        orientation_constraint.header.frame_id = group.get_planning_frame()
 
-        # constraint = Constraints()
-        # constraint.orientation_constraints.append(orientation_constraint)
-        # constraint.position_constraints.append(position_constraint)
-        # group.set_path_constraints(constraint)
+        constraint = Constraints()
+        constraint.orientation_constraints.append(orientation_constraint)
+        constraint.position_constraints.append(position_constraint)
+        group.set_path_constraints(constraint)
         current_pose = group.get_current_pose().pose
         allow_replanning = False
         planning_time = 10
@@ -447,7 +447,7 @@ class PickAndPlace(object):
                                            allow_replanning, planning_time, threshold)
             # current_pose = group.get_current_pose().pose
             rospy.sleep(0.01)
-        # group.clear_path_constraints()
+        group.clear_path_constraints()
         # print "Successfully lifted gripper to z: ", current_pose.position.z
 
         return True

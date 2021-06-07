@@ -41,7 +41,7 @@ def ClaimNewOnion():
 
 def Pick():
     # Create a SMACH state machine
-    Pick = ppv.StateMachine(outcomes=['TIMED_OUT', 'SUCCEEDED'])
+    Pick = ppv.StateMachine(outcomes=['TIMED_OUT', 'SUCCEEDED', 'FAILED'])
     Pick.userdata.sm_x = []
     Pick.userdata.sm_y = []
     Pick.userdata.sm_z = []
@@ -72,6 +72,7 @@ def Pick():
             ppv.StateMachine.add('LIFTUP', ppv.Liftup(),
                         transitions={'success': 'SUCCEEDED', 
                                     'failed':'LIFTUP',
+                                    'no_grasp':'FAILED',
                                     'timed_out': 'TIMED_OUT'},
                         remapping={'counter':'sm_counter'})
 
@@ -178,7 +179,7 @@ def PlaceOnConveyor():
 
 
 def main():
-    policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
+    policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/learned_policy.csv', delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
     # print "\nI'm in main now!"
     ppv.rospy.init_node('policy_exec_phys', anonymous=True, disable_signals=False)
@@ -197,8 +198,8 @@ def main():
             print '\nCurrent state is: ',ppv.current_state
             print '\nExecuting action: ',policy[ppv.current_state]
             outcome = actList[policy[ppv.current_state]]()
-            if outcome == 'TIMED_OUT':
-                print("\nTimed out, so going back to claim again!")
+            if outcome == 'TIMED_OUT' or outcome == 'FAILED':
+                print("\nTimed out/Failed, so going back to claim again!")
                 outcome = actList[4]()
         except ppv.rospy.ROSInterruptException:
             ppv.rospy.signal_shutdown("Shutting down node, ROS interrupt received!")
