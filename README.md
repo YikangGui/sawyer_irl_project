@@ -40,6 +40,12 @@ The following are the steps to be followed to get this package working:
    `kinematics_solver: kdl_kinematics_plugin/KDLKinematicsPlugin` to `kinematics_solver: trac_ik_kinematics_plugin/TRAC_IKKinematicsPlugin`
   
    - Here's the wiki [link](https://ros-planning.github.io/moveit_tutorials/doc/trac_ik/trac_ik_tutorial.html) for reference.
+
+   - After this, in the same kinematics.yaml file, add this at the end of each move group (in this case, right_arm and head):
+  
+          solve_type: Distance
+   
+     This makes the IK solver prefer least path cost solutions.
    
   2.1) This is still a work in progress, but if you want to add STOMP path planning library as a smoothing filter over OMPL, check these [instructions](https://github.com/thinclab/sawyer_irl_project/blob/master/OMPL-STOMP_smoothing_filter.md)
       
