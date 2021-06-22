@@ -59,7 +59,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   box_pose.orientation.w = 1.0;
   box_pose.position.x =  0.75;
   box_pose.position.y = 0.0;
-  box_pose.position.z = -0.47;
+  box_pose.position.z = -0.46;
 
   collision_objects[0].primitives.push_back(primitive);
   collision_objects[0].primitive_poses.push_back(box_pose);
@@ -82,7 +82,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   box_pose1.orientation.w = 1.0;
   box_pose1.position.x =  0.95;
   box_pose1.position.y = 0.0;
-  box_pose1.position.z = -0.09;
+  box_pose1.position.z = -0.08;
 
   collision_objects[1].primitives.push_back(primitive1);
   collision_objects[1].primitive_poses.push_back(box_pose1);
@@ -127,7 +127,7 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   box_pose2.orientation.w = 1.0;
   box_pose2.position.x =  0.55;
   box_pose2.position.y = 0.0;
-  box_pose2.position.z = -0.09;
+  box_pose2.position.z = -0.08;
 
   collision_objects[3].primitives.push_back(primitive2);
   collision_objects[3].primitive_poses.push_back(box_pose2);

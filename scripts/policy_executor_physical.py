@@ -179,7 +179,7 @@ def PlaceOnConveyor():
 
 
 def main():
-    policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/learned_policy.csv', delimiter=' ')
+    policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
     # print "\nI'm in main now!"
     ppv.rospy.init_node('policy_exec_phys', anonymous=True, disable_signals=False)
