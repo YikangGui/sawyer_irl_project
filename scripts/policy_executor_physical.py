@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import pnp_physical_vision as ppv
+import rospkg
 
 def ClaimNewOnion():
     # Create a SMACH state machine
@@ -159,10 +160,8 @@ def PlaceOnConveyor():
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'color': 'sm_color','counter':'sm_counter'})
             ppv.StateMachine.add('DETACH', ppv.Detach_object(),
-                            transitions={'success':'SUCCEEDED', 
-                                        'failed':'DETACH',
-                                        'timed_out': 'TIMED_OUT'},
-                            remapping={'counter':'sm_counter'})
+                            transitions={'success':'SUCCEEDED', import rospkg
+
             # ppv.StateMachine.add('LIFTUP', ppv.Liftup(),
             #             transitions={'success': 'SUCCEEDED', 
             #                         'failed':'LIFTUP',
@@ -179,7 +178,9 @@ def PlaceOnConveyor():
 
 
 def main():
-    policy = ppv.np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
+    rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
+    path = rospack.get_path('sawyer_irl_project')   # get the file path for sawyer_irl_project
+    policy = ppv.np.genfromtxt(path+'/scripts/expert_policy.csv', delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
     # print "\nI'm in main now!"
     ppv.rospy.init_node('policy_exec_phys', anonymous=True, disable_signals=False)

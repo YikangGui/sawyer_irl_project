@@ -14,6 +14,7 @@ import rospy
 from sawyer_irl_project.msg import onions_blocks_poses
 from gazebo_ros_link_attacher.srv import Attach, AttachRequest, AttachResponse
 import numpy as np
+import rospkg
 
 ''' Picked/AtHome - means Sawyer is in hover plane at home position
     onionLoc = {0: 'OnConveyor', 1: 'InFront',
@@ -29,10 +30,9 @@ flag = False
 good_onion = False
 pnp = PickAndPlace()
 idx = -1
-policy = np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/learned_policy.csv', delimiter=' ')
-# policy = np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
-# policy = np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/test_expert_policy.csv', delimiter=' ')
-
+rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
+path = rospack.get_path('sawyer_irl_project')   # get the file path for sawyer_irl_project
+policy = np.genfromtxt(path+'/scripts/expert_policy.csv', delimiter=' ')
 def sid2vals(s, nOnionLoc=4, nEEFLoc=4, nPredict=3, nlistIDStatus=3):
     sid = s
     onionloc = int(mod(sid, nOnionLoc))
