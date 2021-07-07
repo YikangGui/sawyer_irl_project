@@ -1,11 +1,14 @@
 import numpy as np
+import rospkg
 nOnionLoc = 4
 nEEFLoc = 4
 nPredict = 3
 nlistIDStatus = 3
 nS = nOnionLoc*nEEFLoc*nPredict*nlistIDStatus
 nA = 7
-policy = np.genfromtxt('/home/psuresh/catkin_ws/src/sawyer_irl_project/scripts/expert_policy.csv', delimiter=' ')
+rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
+path = rospack.get_path('sawyer_irl_project')   # get the file path for sawyer_irl_project
+policy = np.genfromtxt(path+'/scripts/expert_policy.csv', delimiter=' ')
 
 def sid2vals(s, nOnionLoc=4, nEEFLoc=4, nPredict=3, nlistIDStatus=3):
     sid = s
