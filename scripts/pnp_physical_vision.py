@@ -387,23 +387,28 @@ class Placeonconveyor(State):
             userdata.counter = 0
             return 'timed_out'
 
-        place = pnp.placeOnConveyor()
-        rospy.sleep(0.05)
-        if place:
-            detach = gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
-            lift = pnp.liftgripper()
-            rospy.sleep(0.01)
-            if lift:
-                userdata.counter = 0
-                current_state = vals2sid(ol=0, eefl=0, pred=2, listst=2)
-                print '\nCurrent state after placing on conveyor: ', current_state
-                return 'success'
+        preplace = pnp.goto_placeOnConv()
+        if preplace:
+            place = pnp.placeOnConveyor()
+            rospy.sleep(0.05)
+            if place:
+                detach = gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
+                lift = pnp.liftgripper()
+                rospy.sleep(0.01)
+                if lift:
+                    userdata.counter = 0
+                    current_state = vals2sid(ol=0, eefl=0, pred=2, listst=2)
+                    print '\nCurrent state after placing on conveyor: ', current_state
+                    return 'success'
+                else:
+                    userdata.counter += 1
+                    return 'failed'
             else:
                 userdata.counter += 1
                 return 'failed'
         else:
-            userdata.counter += 1
-            return 'failed'
+                userdata.counter += 1
+                return 'failed'
 
 
 class Placeinbin(State):
@@ -419,7 +424,7 @@ class Placeinbin(State):
             userdata.counter = 0
             return 'timed_out'
 
-        place = pnp.goto_bin()
+        place = pnp.goto_bin(usePoseGoal = False)
         rospy.sleep(0.01)
         if place:
             userdata.counter = 0
