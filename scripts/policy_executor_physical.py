@@ -180,7 +180,14 @@ def PlaceOnConveyor():
 def main():
     rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
     path = rospack.get_path('sawyer_irl_project')   # get the file path for sawyer_irl_project
-    policy = ppv.np.genfromtxt(path+'/scripts/expert_policy.csv', delimiter=' ')
+    if len(sys.argv) < 1:
+            print "Default policy - expert chosen"
+            policyfile = "expert.csv"
+        else:
+            policyfile = ppv.sys.argv[1]
+            print "\n{} {} chosen".format(policyfile)
+    
+    policy = ppv.np.genfromtxt(path+'/scripts/'+ policyfile, delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
     # print "\nI'm in main now!"
     ppv.rospy.init_node('policy_exec_phys', anonymous=True, disable_signals=False)
