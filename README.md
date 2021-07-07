@@ -6,7 +6,7 @@ Owned By: THINC Lab, Department of Computer Science,
 
 Currently Managed By: Prasanth Sengadu Suresh.
 
-This package uses Inverse Reinforcement Learning -- Apprenticeship Learning/Learning from Demonstration to teach Sawyer Robot to perform vegetable sorting on a conveyor line alongside a Human Expert.
+This package uses Inverse Reinforcement Learning -- Learning from Demonstration to teach Sawyer Robot to perform vegetable sorting on a conveyor line alongside a Human Expert.
 
 This package is built upon the Sawyer/Intera ROS packages and uses Robotiq 2F-85 Gripper as the End Effector.
 ## The following instructions are written for Ubuntu 16.04, ROS Kinetic. If you are on Melodic, check the additional changes on [Melodic migration Readme file](https://github.com/thinclab/sawyer_irl_project/blob/master/Melodic_Migration_Readme.md).
