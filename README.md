@@ -13,6 +13,8 @@ This package is built upon the Sawyer/Intera ROS packages and uses Robotiq 2F-85
 
 If you need to install the packages for Kinect V2 with Ubuntu, check out this [link](https://github.com/thinclab/sawyer_irl_project/blob/master/Kinect_install_readme.md).
 
+If you need to install the packages for Realsense2-D435 with Ubuntu, check out this [link](https://github.com/thinclab/sawyer_irl_project/blob/master/Realsense_install_readme.md).
+
 The following are the steps to be followed to get this package working:
 
   Assuming you have a working version of Ubuntu (This package has been built and tested on Ubuntu 16.04)
@@ -125,7 +127,9 @@ The following are the steps to be followed to get this package working:
            
 =====================================================================================================
 
-### THIS IS STILL UNDER CONSTRUCTION. PLEASE MOVE TO THE NEXT PART. If you want to use the master launch file to run the whole setup at a time (which I don't recommend btw, because it makes debugging hard if something crashes):
+### THIS IS STILL UNDER CONSTRUCTION. PLEASE MOVE TO THE NEXT PART. 
+
+## If you want to use the master launch file to run the whole setup at a time (which I don't recommend btw, because it makes debugging hard if something crashes):
        
    - Make sure you're in intera.sh environment and sequentially do the following:
 
@@ -159,7 +163,18 @@ The following are the steps to be followed to get this package working:
    - For obtaining coordinates using vision:
           Refer to [this link](https://github.com/thinclab/sanet_onionsorting/blob/master/README.md)
           
-   - For regular pick and place:
+   - For testing and debugging use the following script:
         
          rosrun sawyer_irl_project simple_pnp.py    (Make sure all files in this folder are set to executable in file properties)
 
+   - For performing pick and place using vision and a policy.csv file:
+   
+     - Make sure the robot has been started properly (if physical robot else follow gazebo commands).
+
+     - Make sure the camera driver is running and you can view the camera topics, etc correctly.
+
+     - Make sure the static transforms launch file for the camera is running(Follow camera specific commands for this).
+
+     - Run the following command with the required policy filename in place of 'expert_policy.csv':
+
+       `rosrun sawyer_irl_project policy_executor_physical.py expert_policy.csv`
