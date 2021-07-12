@@ -219,7 +219,7 @@ class Dipdown(State):
             userdata.counter = 0
             return 'timed_out'
 
-        dip = pnp.staticDip(z_pose=0.105)
+        dip = pnp.staticDip(z_pose=0.095)
         rospy.sleep(0.1)
         if dip:
             userdata.counter = 0
@@ -327,7 +327,11 @@ class View(State):
                 else:
                     # print("\nCurrent repeat count is: ",userdata.counter)
                     userdata.counter += 1
-                    return 'failed'
+                    print("Sticking to detection on conveyor since we couldn't find onion in hand!")
+                    self.color = int(pnp.onion_color)
+                    current_state = int(vals2sid(ol=1, eefl=1, pred=self.color, listst=2))
+                    print "\nCurrent state is: ", current_state
+                    return 'success'
             else:
                 userdata.counter += 1
                 return 'failed'
