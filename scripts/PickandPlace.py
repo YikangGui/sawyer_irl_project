@@ -356,7 +356,7 @@ class PickAndPlace(object):
         # return dip
         return status
 
-    def staticDip(self, z_pose = 0.1, tolerance=0.055):
+    def staticDip(self, z_pose = 0.1, tolerance=0.075):
         
         group = self.group
         current_pose = group.get_current_pose().pose
@@ -381,7 +381,7 @@ class PickAndPlace(object):
         constraint.position_constraints.append(position_constraint)
         group.set_path_constraints(constraint)
         allow_replanning = False
-        planning_time = 10
+        planning_time = 12
         before_dip = current_pose.position.z
         # dip = False
         # while not dip: 
@@ -403,7 +403,7 @@ class PickAndPlace(object):
         # return True
 
 
-    def liftgripper(self, threshold = 0.025):
+    def liftgripper(self, threshold = 0.055):
         # approx centers of onions at 0.82, width of onion is 0.038 m. table is at 0.78
         # length of gripper is 0.163 m The gripper should not go lower than
         # (height_z of table w.r.t base+gripper-height/2+tolerance) = 0.78-0.93+0.08+0.01=-0.24
@@ -436,7 +436,7 @@ class PickAndPlace(object):
         group.set_path_constraints(constraint)
         current_pose = group.get_current_pose().pose
         allow_replanning = False
-        planning_time = 10
+        planning_time = 12
         lifted = False
         # print "Current z pose: ", current_pose.position.z
         z_pose = current_pose.position.z + 0.25

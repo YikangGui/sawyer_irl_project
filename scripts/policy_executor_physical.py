@@ -160,7 +160,10 @@ def PlaceOnConveyor():
                                         'timed_out': 'TIMED_OUT'},
                             remapping={'color': 'sm_color','counter':'sm_counter'})
             ppv.StateMachine.add('DETACH', ppv.Detach_object(),
-                            transitions={'success':'SUCCEEDED', import rospkg
+                            transitions={'success':'SUCCEEDED', 
+                                        'failed':'DETACH',
+                                        'timed_out': 'TIMED_OUT'},
+                            remapping={'counter':'sm_counter'})
 
             # ppv.StateMachine.add('LIFTUP', ppv.Liftup(),
             #             transitions={'success': 'SUCCEEDED', 
@@ -180,12 +183,12 @@ def PlaceOnConveyor():
 def main():
     rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
     path = rospack.get_path('sawyer_irl_project')   # get the file path for sawyer_irl_project
-    if len(sys.argv) < 1:
+    if len(ppv.sys.argv) < 1:
             print "Default policy - expert chosen"
             policyfile = "expert.csv"
-        else:
-            policyfile = ppv.sys.argv[1]
-            print "\n{} {} chosen".format(policyfile)
+    else:
+        policyfile = ppv.sys.argv[1]
+        print "\n{} chosen".format(policyfile)
     
     policy = ppv.np.genfromtxt(path+'/scripts/'+ policyfile, delimiter=' ')
     actList = {0:InspectAfterPicking, 1:PlaceOnConveyor, 2:PlaceInBin, 3:Pick, 4:ClaimNewOnion} 
