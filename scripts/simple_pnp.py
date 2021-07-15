@@ -31,20 +31,21 @@ def main():
     current_pose = group.get_current_pose().pose
     allow_replanning = True
     planning_time = 10
+    status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75, 0.0, 0.077, allow_replanning, planning_time, thresh = 0.001)
     # state = pnp.robot.get_current_state()
     # group.set_start_state(state)
-    for i in range(5):
-      pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
-      status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.9, 0.25, 0.2, allow_replanning, planning_time, thresh = 0.001)
-      pnp.staticDip(z_pose = 0.10)
-      pnp.liftgripper()
-      pnp.goto_bin(usePoseGoal = False)
-      pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
-      status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.9, 0.25, 0.2, allow_replanning, planning_time, thresh = 0.001)
-      pnp.staticDip(z_pose = 0.10)
-      pnp.liftgripper()
-      pnp.goto_placeOnConv()
-      rospy.sleep(0.1)
+    # for i in range(5):
+    #   pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
+    #   status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.9, 0.25, 0.2, allow_replanning, planning_time, thresh = 0.001)
+    #   pnp.staticDip(z_pose = 0.10)
+    #   pnp.liftgripper()
+    #   pnp.goto_bin(usePoseGoal = False)
+    #   pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
+    #   status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.9, 0.25, 0.2, allow_replanning, planning_time, thresh = 0.001)
+    #   pnp.staticDip(z_pose = 0.10)
+    #   pnp.liftgripper()
+    #   pnp.goto_placeOnConv()
+    #   rospy.sleep(0.1)
     print "\n",group.get_current_pose().pose.position
 
   except rospy.ROSInterruptException:
