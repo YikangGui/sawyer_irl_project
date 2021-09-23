@@ -111,7 +111,7 @@ int main(int argc, char **argv)
     current_onions_msg.data.clear();
 
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-    moveit::planning_interface::MoveGroupInterface group("right_arm");
+    moveit::planning_interface::MoveGroupInterface group("manipulator");
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     collision_objects.resize(total_onions);
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
             /* generate random number between 1 and 10: */
             //onion_gen = std::rand() % 100;
             onion_gen = i;
-
+	    /*
             if ((onion_gen % 2) == 0)
             {
                 cout << "Generating good onion";
@@ -156,6 +156,7 @@ int main(int argc, char **argv)
             }
 
             else
+	    */
             {
                 cout << "Generating bad onion";
                 color_index = 0;

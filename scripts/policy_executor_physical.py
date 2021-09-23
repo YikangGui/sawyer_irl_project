@@ -200,7 +200,7 @@ def main():
     choice = 'real'
     # camera = ppv.Camera('kinectv2', rgbtopic, depthtopic, camerainfo, choice)
     # ppv.getCameraInstance(camera)
-    ppv.pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
+    # ppv.pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
     outcome = actList[4]()    
     while not ppv.rospy.is_shutdown() and outcome != 'SORT COMPLETE':
         print '\n OUTCOME: ', outcome

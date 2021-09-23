@@ -188,8 +188,8 @@ class Approach(State):
             userdata.counter = 0
             return 'timed_out'
 
-        # home = pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
-        home = True
+        home = pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
+        # home = True
         gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
         rospy.sleep(0.1)
         if home:
@@ -219,7 +219,7 @@ class Dipdown(State):
             userdata.counter = 0
             return 'timed_out'
 
-        dip = pnp.staticDip(z_pose=0.095)
+        dip = pnp.staticDip(z_pose=0.09)
         rospy.sleep(0.1)
         if dip:
             userdata.counter = 0

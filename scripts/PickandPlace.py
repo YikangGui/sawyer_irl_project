@@ -439,7 +439,7 @@ class PickAndPlace(object):
         planning_time = 12
         lifted = False
         # print "Current z pose: ", current_pose.position.z
-        z_pose = current_pose.position.z + 0.25
+        z_pose = current_pose.position.z + 0.2
         while not lifted:
             lifted = self.go_to_pose_goal(current_pose.orientation.x, current_pose.orientation.y, current_pose.orientation.z, current_pose.orientation.w, current_pose.position.x,
                                            current_pose.position.y, 
