@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Author: Prasanth Suresh (ps32611@uga.edu)
- Description: Sawyer sorting policy executor -->
-<!-- Do not edit/replicate without permission -->
-<launch>
-	<node name="policy_executor" pkg="sawyer_irl_project" type="policy_executor.py" output="screen"/>
-</launch> 
