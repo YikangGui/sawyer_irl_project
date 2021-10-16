@@ -123,7 +123,7 @@ The following are the steps to be followed to get this package working:
         
    [Workstation Setup](http://sdk.rethinkrobotics.com/intera/Workstation_Setup)
         
-   - Make sure you are able to connect to the gripper using the following steps: (DO ALL THESE STEPS WITHIN THE ./intera.sh ENV, ALL IN NEW TERMINALS)
+   - Make sure you are able to connect to the gripper using the following steps: (MAKE SURE YOU CD INTO CATKIN_WS AND DO ALL THESE STEPS WITHIN THE ./intera.sh ENV, ALL IN NEW TERMINALS)
            
 =====================================================================================================
 
