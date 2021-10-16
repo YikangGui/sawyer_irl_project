@@ -7,7 +7,7 @@ import numpy as np
 import moveit_msgs.msg
 from geometry_msgs.msg import PoseStamped
 from rospy.client import init_node
-from std_msgs.msg import String, Int8MultiArray
+from std_msgs.msg import String, Int8MultiArray, Empty
 from operator import mod
 import random
 import sys
@@ -20,7 +20,6 @@ from smach import *
 from smach_ros import *
 from smach_msgs.msg import *
 import rospkg
-
 
 rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
 # get the file path for sanet_onionsorting
@@ -78,7 +77,7 @@ class Get_info(State):
         self.callback_vision(rospy.wait_for_message("/object_location", OBlobs))
 
     def callback_vision(self, msg):
-        # print '\nCallback vision\n'
+        print '\nCallback vision\n'
         self.x = msg.x
         self.y = msg.y
         self.z = msg.z
@@ -90,7 +89,7 @@ class Get_info(State):
 
     def execute(self, userdata):
         # rospy.loginfo('Executing state: Get_info')
-        if userdata.counter >= 500:
+        if userdata.counter >= 50:
             userdata.counter = 0
             return 'timed_out'
 
@@ -105,22 +104,36 @@ class Get_info(State):
                 # print("I'm updated")
                 # print '\nUser data x,y,z in Get_info are: \n', userdata.x,userdata.y,userdata.z
                 # rospy.sleep(5)
+                self.is_updated = False
                 return 'updated'
             else:
                 print '\nSort Complete!\n'
+                self.is_updated = False
+                userdata.x = []
+                userdata.y = []
+                userdata.z = []
+                userdata.color = []
+                userdata.counter = 0
                 return 'completed'
         else:
             userdata.counter += 1
             # print("I'm not updated")
+            self.is_updated = False
+            userdata.x = []
+            userdata.y = []
+            userdata.z = []
+            userdata.color = []
+            self.callback_vision(rospy.wait_for_message("/object_location", OBlobs))
             return 'not_updated'
 
 
 class Claim(State):
     def __init__(self):
-        State.__init__(self, outcomes=['updated', 'not_updated', 'timed_out', 'not_found', 'completed'],
+        State.__init__(self, outcomes=['updated', 'not_updated', 'timed_out', 'not_found', 'move', 'completed'],
                        input_keys=['x', 'y', 'z', 'color', 'counter'],
                        output_keys=['x', 'y', 'z', 'color', 'counter'])
         self.is_updated = False
+        self.conv_pub = rospy.Publisher('/toggle_led', Empty, queue_size = 1)
         # print("I came to claim")
 
     def execute(self, userdata):
@@ -136,7 +149,7 @@ class Claim(State):
         print '\nMax index is = ', max_index
         pnp.onion_index = 0
         for i in range(max_index):
-            if len(userdata.y) >= i:
+            if len(userdata.y) >= i:    # The number of onions found is >= the index value I'm considering sorting now.
                 try:
                     if userdata.y[i] > -0.35 and userdata.y[i] < 0.25:
                         pnp.target_location_x = userdata.x[i]
@@ -153,12 +166,24 @@ class Claim(State):
                 except IndexError:
                     pass
             else:
-                print '\nSort complete!'
-                return 'completed'
+                print '\nCompleted this batch, moving on!'
 
         if max_index == done_onions:
-            print '\nAll onions are sorted!'
-            return 'completed'
+            # print '\nAll onions are sorted!'
+            msg = Empty()
+            rospy.sleep(0.1)
+            self.conv_pub.publish(msg)
+            rospy.sleep(4)
+            self.conv_pub.publish(msg)
+            rospy.sleep(1)
+            userdata.x = []
+            userdata.y = []
+            userdata.z = []
+            userdata.color = []
+            userdata.counter = 0
+            max_index = 0
+            done_onions = 0
+            return 'move'
         else:
             done_onions = 0
 
@@ -219,7 +244,7 @@ class Dipdown(State):
             userdata.counter = 0
             return 'timed_out'
 
-        dip = pnp.staticDip(z_pose=0.09)
+        dip = pnp.staticDip(z_pose=0.08)
         rospy.sleep(0.1)
         if dip:
             userdata.counter = 0

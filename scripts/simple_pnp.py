@@ -29,9 +29,12 @@ def main():
     # gripper_to_pos(255, 255, 200, False)    # GRIPPER TO POSITION 50
     group = pnp.group
     current_pose = group.get_current_pose().pose
-    allow_replanning = True
-    planning_time = 10
-    status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75, 0.0, 0.077, allow_replanning, planning_time, thresh = 0.001)
+    allow_replanning = False
+    planning_time = 15
+    # pnp.goto_home(0.3, goal_tol=0.01, orientation_tol=0.1)
+    # status = pnp.go_to_pose_goal(current_pose.orientation.x, current_pose.orientation.y, current_pose.orientation.z, current_pose.orientation.w, 0.75, 0.0, 0.08, allow_replanning, planning_time, thresh = 0.001)
+    status = pnp.go_to_pose_goal(pnp.q[0], pnp.q[1], pnp.q[2], pnp.q[3], 0.75, 0.0, 0.078, allow_replanning, planning_time, thresh = 0.001)
+
     # state = pnp.robot.get_current_state()
     # group.set_start_state(state)
     # for i in range(5):
