@@ -20,6 +20,7 @@ from smach import *
 from smach_ros import *
 from smach_msgs.msg import *
 import rospkg
+from collections import Counter
 
 rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
 # get the file path for sanet_onionsorting
@@ -29,7 +30,7 @@ sys.path.append(path + '/scripts/')
 # from rgbd_imgpoint_to_tf import Camera
 
 # Global initializations
-pnp = PickAndPlace(init_node=False)
+pnp = PickAndPlace(init_node=False, z_tf=-0.743)
 current_state = 140
 done_onions = 0
 # camera = None 
@@ -125,6 +126,115 @@ class Get_info(State):
             userdata.color = []
             self.callback_vision(rospy.wait_for_message("/object_location", OBlobs))
             return 'not_updated'
+
+
+class Get_info_w_check(State):
+    def __init__(self, frame_threshold=5, distance_threshold=0.02):
+        # global camera
+        State.__init__(self, outcomes=['updated', 'not_updated', 'timed_out', 'completed'],
+                       input_keys=['x', 'y', 'z', 'color', 'counter'],
+                       output_keys=['x', 'y', 'z', 'color', 'counter'])
+        self.x = []
+        self.y = []
+        self.z = []
+        self.color = []
+        self.frame_threshold = frame_threshold
+        self.distance_threshold = distance_threshold
+        self.current_count = 0
+        self.is_updated = False
+
+        self.arxiv_refresh()
+
+    def arxiv_refresh(self):
+        self.x_arxiv = []
+        self.y_arxiv = []
+        self.z_arxiv = []
+        self.color_arxiv = []
+
+    def check_main(self, topic="/object_location", topic_type=OBlobs):
+        rospy.loginfo('Begin check!')
+        for _ in range(self.frame_threshold):
+            msg = rospy.wait_for_message(topic, topic_type)
+            rospy.loginfo('Checking!')
+
+            rospy.sleep(0.1)
+            self.is_updated = True
+            msg_len = len(msg.x)
+            for i in range(msg_len):
+                x = msg.x[i]
+                y = msg.y[i]
+                z = msg.z[i]
+                color = msg.color[i]
+
+                self.check_msg(x, y, z, color)
+        rospy.loginfo('End check!')
+
+    def check_msg(self, x, y, z, color):
+        for i in range(len(self.x_arxiv)):
+            if abs(x - self.x_arxiv[i][0]) < self.distance_threshold and abs(y - self.y_arxiv[i][0]) < self.distance_threshold and abs(z - self.z_arxiv[i][0]) < self.distance_threshold:
+                self.x_arxiv[i].append(x)
+                self.y_arxiv[i].append(y)
+                self.z_arxiv[i].append(z)
+                self.color_arxiv[i].append(color)
+                return i 
+        if x != -100 and y != -100 and z != -100:
+            self.x_arxiv.append([x])
+            self.y_arxiv.append([y])
+            self.z_arxiv.append([z])
+            self.color_arxiv.append([color])
+            return -1
+        return 
+
+    def execute(self, userdata):
+        self.check_main()
+
+        if userdata.counter >= 500:
+            userdata.counter = 0
+            return 'timed_out'
+
+        if not self.is_updated:
+            userdata.counter += 1
+            self.is_updated = False
+            userdata.x = []
+            userdata.y = []
+            userdata.z = []
+            userdata.color = []
+            # print("I'm not updated")
+            return 'not_updated'
+
+        arxiv_len = len(self.x_arxiv)
+        if arxiv_len == 0:
+            print '\nSort Complete!\n'
+            self.is_updated = False
+            userdata.x = []
+            userdata.y = []
+            userdata.z = []
+            userdata.color = []
+            userdata.counter = 0
+            return 'completed'
+
+        x_output = []
+        y_output = []
+        z_output = []
+        color_output = []
+
+        for i in range(arxiv_len):
+            if len(self.color_arxiv[i]) > 1:
+                instance_len = len(self.color_arxiv[i])
+                x_output.append(sum(self.x_arxiv[i]) / instance_len)
+                y_output.append(sum(self.y_arxiv[i]) / instance_len)
+                z_output.append(sum(self.z_arxiv[i]) / instance_len)
+                color_output.append(Counter(self.color_arxiv[i]).most_common(1)[0][0])
+
+        userdata.x = x_output
+        userdata.y = y_output
+        userdata.z = z_output
+        userdata.color = color_output
+        userdata.counter = 0
+        self.is_updated = False
+        rospy.sleep(0.01)
+        self.arxiv_refresh()
+        return 'updated'
 
 
 class Claim(State):
@@ -244,7 +354,7 @@ class Dipdown(State):
             userdata.counter = 0
             return 'timed_out'
 
-        dip = pnp.staticDip(z_pose=0.08)
+        dip = pnp.staticDip()
         rospy.sleep(0.1)
         if dip:
             userdata.counter = 0

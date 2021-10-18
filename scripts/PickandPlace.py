@@ -28,7 +28,7 @@ import random
 
 
 class PickAndPlace(object):
-    def __init__(self, init_node = True, limb='right', tip_name="right_gripper_tip", target_location_x = -100, target_location_y = -100, target_location_z = -100):
+    def __init__(self, init_node = True, limb='right', tip_name="right_gripper_tip", target_location_x = -100, target_location_y = -100, target_location_z = -100, z_tf=-0.735):
         super(PickAndPlace, self).__init__()
 
         # print("Class init happening bro!")
@@ -92,6 +92,7 @@ class PickAndPlace(object):
         self.target_location_z = target_location_z
         self.onion_index = 0
         self.onion_color = None
+        self.z_tf = z_tf
 
     def all_close(self, goal, actual, tolerance = 0.01):
         """
@@ -356,7 +357,7 @@ class PickAndPlace(object):
         # return dip
         return status
 
-    def staticDip(self, z_pose = 0.1, tolerance=0.075):
+    def staticDip(self, tolerance=0.075):
         
         group = self.group
         current_pose = group.get_current_pose().pose
@@ -387,7 +388,7 @@ class PickAndPlace(object):
         # while not dip: 
         dip = self.go_to_pose_goal(current_pose.orientation.x, current_pose.orientation.y, current_pose.orientation.z, current_pose.orientation.w, self.target_location_x,  # accounting for tolerance error
                                 self.target_location_y,  # accounting for tolerance error
-                                z_pose,  # This is where we dip
+                                self.target_location_z + self.z_tf,  # This is where we dip
                                 allow_replanning, planning_time, tolerance/3)
         # current_pose = group.get_current_pose().pose
         rospy.sleep(0.01)
