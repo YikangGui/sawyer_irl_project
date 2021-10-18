@@ -14,7 +14,7 @@ def ClaimNewOnion():
         # Open the container
         with ClaimNewOnion:
             # Add states to the container
-            ppv.StateMachine.add('GETINFO', ppv.Get_info(), 
+            ppv.StateMachine.add('GETINFO', ppv.Get_info_w_check(), 
                             transitions={'updated':'CLAIM', 
                                         'not_updated':'GETINFO',
                                         'timed_out': 'TIMED_OUT',
