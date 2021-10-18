@@ -31,7 +31,7 @@ sys.path.append(path + '/scripts/')
 # from rgbd_imgpoint_to_tf import Camera
 
 # Global initializations
-pnp = PickAndPlace(init_node=False, z_tf=-0.743)
+pnp = PickAndPlace(init_node = False, z_tf = -0.743) # z_tf changes z dist from world origin to robot origin for eef dip.
 current_state = 140
 done_onions = 0
 # camera = None 

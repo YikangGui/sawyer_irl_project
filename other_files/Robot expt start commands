@@ -1,0 +1,17 @@
+sudo chmod 777 /dev/ttyUSB0
+roslaunch robotiq_2f_gripper_action_server robotiq_2f_gripper_action_server_rtu.launch 
+rosrun robotiq_2f_gripper_control Robotiq2FGripperSimpleController.py
+roslaunch sawyer_irl_project upload_gripper.launch
+roslaunch sawyer_irl_project robot.launch
+roslaunch sawyer_moveit_config sawyer_moveit.launch rviz_gui:=False
+roslaunch realsense2_camera d435_real.launch
+roslaunch realsense2_camera d435_tf.launch
+rosrun sanet_onionsorting yolo_service.py --choice real --cam realsense
+rosrun sanet_onionsorting rgbd_imgpoint_to_tf.py --choice real --cam realsense
+rosrun sawyer_irl_project policy_executor_physical.py expert_policy.csv
+
+
+sudo chmod 777 /dev/ttyACM0
+rosrun rosserial_python serial_node.py /dev/ttyACM0
+
+rostopic pub toggle_led std_msgs/Empty --once
