@@ -175,6 +175,22 @@ The following are the steps to be followed to get this package working:
 
      - Make sure the static transforms launch file for the camera is running(Follow camera specific commands for this).
 
+     - If you want to use automatic conveyor movement with the real robot(assuming you have an arduino+xbee shield setup at 57600 baud rate):
+    
+          - Connect the circuit as shown in sawyer_irl_project/other_files/arduino_conveyor_circuit.jpg
+          
+          - Dump the code from sawyer_irl_project/other_files/pubsub_xbee_conveyor.ino
+          
+          - Open a new terminal, move to ./intera.sh env, then use the following commands:
+          
+                    sudo chmod 777 /dev/ttyACM0
+                    
+                    rosrun rosserial_python serial_node.py /dev/ttyACM0
+                    
+             If the conveyor already starts moving, stop it using the following command on a new terminal(with intera env):
+             
+                    rostopic pub toggle_led std_msgs/Empty --once
+
      - Run the following command with the required policy filename in place of 'expert_policy.csv':
 
        `rosrun sawyer_irl_project policy_executor_physical.py expert_policy.csv`
