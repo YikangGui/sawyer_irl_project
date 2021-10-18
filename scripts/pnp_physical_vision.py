@@ -19,6 +19,7 @@ from sanet_onionsorting.srv import yolo_srv
 from smach import *
 from smach_ros import *
 from smach_msgs.msg import *
+import time
 import rospkg
 
 rospack = rospkg.RosPack()  # get an instance of RosPack with the default search paths
@@ -173,9 +174,9 @@ class Claim(State):
             msg = Empty()
             rospy.sleep(0.1)
             self.conv_pub.publish(msg)
-            rospy.sleep(4)
+            rospy.sleep(3.25)    # With the conveyor speed controller knob at 40, takes around 3 secs to move to next batch.
             self.conv_pub.publish(msg)
-            rospy.sleep(1)
+            rospy.sleep(0.5)
             userdata.x = []
             userdata.y = []
             userdata.z = []
@@ -267,7 +268,7 @@ class Grasp_object(State):
             userdata.counter = 0
             return 'timed_out'
 
-        gr = gripper_to_pos(75, 60, 200, False)    # GRIPPER TO POSITION 60
+        gr = gripper_to_pos(75, 120, 200, False)    # GRIPPER TO POSITION 120
         rospy.sleep(2)
         if gr:
             userdata.counter = 0
@@ -342,6 +343,9 @@ class View(State):
             rospy.sleep(1)
             if rotate:
                 print "\nSuccessfully Rotated!"
+                if self.color != None:
+                    pnp.onion_color = self.color
+                    self.color = None   # Making sure no previous values are retained for next check
                 self.checkOnionColor()
                 if self.color != None:
                     current_state = int(vals2sid(ol=1, eefl=1, pred=self.color, listst=2))
@@ -379,9 +383,8 @@ class View(State):
         # camera.save_response(response)
         # if camera.is_updated and camera.found_objects:    
         #     camera.OblobsPublisher()
-
+        tic = time.time()
         self.callback_prediction(rospy.wait_for_message("/object_location", OBlobs))
-
         color = int(pnp.onion_color)
         if self.color != None:
             if self.color != color and self.color == 0:
@@ -390,6 +393,8 @@ class View(State):
                 print '\nRetaining onion color as: ', color
                 self.color = color
         else: pass
+        toc = time.time()
+        print("Onion inspection took: {0} seconds\n".format(toc-tic))
 
     def callback_prediction(self, msg):
 
