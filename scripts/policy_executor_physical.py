@@ -43,6 +43,7 @@ def ClaimNewOnion():
 
 def Pick():
     # Create a SMACH state machine
+    print "test"
     Pick = ppv.StateMachine(outcomes=['TIMED_OUT', 'SUCCEEDED', 'FAILED'])
     Pick.userdata.sm_x = []
     Pick.userdata.sm_y = []

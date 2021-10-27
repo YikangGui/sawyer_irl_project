@@ -31,7 +31,7 @@ sys.path.append(path + '/scripts/')
 # from rgbd_imgpoint_to_tf import Camera
 
 # Global initializations
-pnp = PickAndPlace(init_node = False, z_tf = -0.743) # z_tf changes z dist from world origin to robot origin for eef dip.
+pnp = PickAndPlace(init_node = False, z_tf = -0.693) # z_tf changes z dist from world origin to robot origin for eef dip.
 current_state = 140
 done_onions = 0
 # camera = None 
@@ -130,7 +130,7 @@ class Get_info(State):
 
 
 class Get_info_w_check(State):
-    def __init__(self, frame_threshold=5, distance_threshold=0.02):
+    def __init__(self, frame_threshold=3, distance_threshold=0.02):
         # global camera
         State.__init__(self, outcomes=['updated', 'not_updated', 'timed_out', 'completed'],
                        input_keys=['x', 'y', 'z', 'color', 'counter'],
@@ -324,8 +324,8 @@ class Approach(State):
             userdata.counter = 0
             return 'timed_out'
 
-        home = pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
-        # home = True
+        # home = pnp.goto_home(tolerance=0.1, goal_tol=0.1, orientation_tol=0.1)
+        home = True
         gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
         rospy.sleep(0.1)
         if home:
@@ -379,7 +379,7 @@ class Grasp_object(State):
             return 'timed_out'
 
         gr = gripper_to_pos(75, 120, 200, False)    # GRIPPER TO POSITION 120
-        rospy.sleep(2)
+        rospy.sleep(1)
         if gr:
             userdata.counter = 0
             current_state = vals2sid(ol=3, eefl=3, pred=2, listst=2)
@@ -509,7 +509,7 @@ class View(State):
     def callback_prediction(self, msg):
 
         if max(msg.z) >= 0.85:
-            idx = msg.x.index(max(msg.x))
+            idx = msg.z.index(max(msg.z))
             self.color = msg.color[idx]
             print '\nFound onion in hand. Color is: ', self.color
             # print '\nOnion z value: ', msg.z[idx]
@@ -596,7 +596,7 @@ class Detach_object(State):
             detach = gripper_to_pos(0, 60, 200, False)    # GRIPPER TO POSITION 0
             if detach:
                 userdata.counter = 0
-                rospy.sleep(2)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
+                rospy.sleep(0.1)  # Sleeping here because yolo catches the onion near bin while detaching and that screws up coordinates.
                 '''NOTE: Both place on conveyor and bin use this, so don't update current state here.'''
                 return 'success'
             else:

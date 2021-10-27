@@ -28,7 +28,7 @@ import random
 
 
 class PickAndPlace(object):
-    def __init__(self, init_node = True, limb='right', tip_name="right_gripper_tip", target_location_x = -100, target_location_y = -100, target_location_z = -100, z_tf=-0.735):     # z_tf changes z dist from world origin to robot origin for eef dip.
+    def __init__(self, init_node = True, limb='right', tip_name="right_gripper_tip", target_location_x = -100, target_location_y = -100, target_location_z = -100, z_tf=-0.705):     # z_tf changes z dist from world origin to robot origin for eef dip.
         super(PickAndPlace, self).__init__()
 
         # print("Class init happening bro!")
@@ -357,22 +357,22 @@ class PickAndPlace(object):
         # return dip
         return status
 
-    def staticDip(self, tolerance=0.075):
+    def staticDip(self, tolerance=0.006):
         
         group = self.group
         current_pose = group.get_current_pose().pose
         position_constraint = PositionConstraint()
         position_constraint.target_point_offset.x = 0.1
         position_constraint.target_point_offset.y = 0.1
-        position_constraint.target_point_offset.z = 0.5
+        position_constraint.target_point_offset.z = 0.1
         position_constraint.weight = 0.25
         position_constraint.link_name = group.get_end_effector_link()
         position_constraint.header.frame_id = group.get_planning_frame()
         orientation_constraint = OrientationConstraint()
         orientation_constraint.orientation = Quaternion(x=self.q[0], y=self.q[1], z=self.q[2], w=self.q[3])
-        orientation_constraint.absolute_x_axis_tolerance = 0.3
-        orientation_constraint.absolute_y_axis_tolerance = 0.3
-        orientation_constraint.absolute_z_axis_tolerance = 0.3
+        orientation_constraint.absolute_x_axis_tolerance = 0.1
+        orientation_constraint.absolute_y_axis_tolerance = 0.1
+        orientation_constraint.absolute_z_axis_tolerance = 0.1
         orientation_constraint.weight = 0.5
         orientation_constraint.link_name = group.get_end_effector_link()
         orientation_constraint.header.frame_id = group.get_planning_frame()
@@ -386,8 +386,13 @@ class PickAndPlace(object):
         before_dip = current_pose.position.z
         # dip = False
         # while not dip: 
+        print self.target_location_x
+        print self.target_location_y
+        print self.target_location_z + self.z_tf
+        print self.z_tf
         dip = self.go_to_pose_goal(current_pose.orientation.x, current_pose.orientation.y, current_pose.orientation.z, current_pose.orientation.w, self.target_location_x,  # accounting for tolerance error
                                 self.target_location_y,  # accounting for tolerance error
+                                # 0.08,
                                 self.target_location_z + self.z_tf,  # This is where we dip  # z_tf changes z dist from world origin to robot origin for eef dip.
                                 allow_replanning, planning_time, tolerance/3)
         # current_pose = group.get_current_pose().pose
